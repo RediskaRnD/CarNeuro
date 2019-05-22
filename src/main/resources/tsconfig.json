@@ -1,0 +1,10 @@
+{
+  "compilerOptions": {
+    "module":"amd",
+    "target": "es2018",
+    "removeComments": false,
+    "sourceMap": true,
+    "strict": false
+  },
+  "exclude": ["static/tools"]
+}

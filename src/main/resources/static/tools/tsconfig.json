@@ -1,0 +1,10 @@
+{
+  "compilerOptions": {
+    "module":"amd",
+    "target": "ES6",
+    "removeComments": false,
+    "sourceMap": true,
+    "strict": false,
+    "noImplicitAny": false
+  }
+}
