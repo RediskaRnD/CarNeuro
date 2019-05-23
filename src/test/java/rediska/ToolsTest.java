@@ -11,6 +11,7 @@ import org.testng.annotations.BeforeMethod;
 import java.awt.*;
 import java.io.*;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.Arrays;
@@ -26,10 +27,10 @@ class ToolsTest {
     @BeforeMethod
     void setUp() {
         final Path path = Path.of(FILE_NAME);
+        if (Files.exists(path)) return;
         try (InputStream reader = Files.newInputStream(path, StandardOpenOption.CREATE_NEW)){
             cachedData.load(reader);
         } catch (IOException e) {
-//            throw new RuntimeException(e.getCause());
             e.printStackTrace();
         }
     }
@@ -40,7 +41,7 @@ class ToolsTest {
         try (OutputStream writer = Files.newOutputStream(path)){
             cachedData.store(writer, COMMENTS);
         } catch (IOException e) {
-            throw new RuntimeException(e.getCause());
+            e.printStackTrace();
         }
 
     }
