@@ -48,14 +48,33 @@ class ToolsTest {
 
         for (Object[] arg : args) {
             final Point point = Tools.lineToAngle((Point) arg[0], (float) arg[1], (float) arg[2]);
-            String computedResult = convertToString(point);
-            String cachedResult = getCachedResult(computedResult, arg);
-            if (cachedResult == null) {
+
+            String computedStringValue = convertToString(point);
+            String testName = Thread.currentThread().getStackTrace()[1].getMethodName();
+            String key = Arrays.toString(arg) + testName;
+
+            String cachedValue = getCachedValue(key, computedStringValue);
+            if (cachedValue == null) {
                 continue;
             }
-            Assert.assertTrue(cachedResult.equals(computedResult));
-
+            Assert.assertTrue(cachedValue.equals(computedStringValue));
         }
+    }
+    @Test
+    public void lineToAngle2() {
+        expect(Tools.lineToAngle(new Point(1,8), 1, 3), "1");
+    }
+
+    private <T> void expect(T object, String uniqueNumber) {
+        String testMethodName = Thread.currentThread().getStackTrace()[2].getMethodName();
+        String valueAsString = convertToString(object);
+        String key = testMethodName + "_" + uniqueNumber;
+
+        String cachedValue = getCachedValue(key, valueAsString, );
+        if (cachedValue == null) {
+            return;
+        }
+        Assert.assertTrue(cachedValue.equals(valueAsString));
     }
 
     private <T> String convertToString(T object) {
@@ -73,12 +92,7 @@ class ToolsTest {
 
     private String lastTestName = null;
 
-    private <R,T>  String getCachedResult(String computedResult, T... args ) {
-        String testName = Thread.currentThread().getStackTrace()[2].getMethodName();
-        if (! testName.equals(lastTestName)) lastTestName = testName;
-
-        String key = testName + "_" + Arrays.toString(args);
-
+    private <R,T>  String getCachedValue(String key, String computedResult) {
         String value = cachedData.getProperty(key);
         if (value == null) cachedData.setProperty(key, computedResult);
         return value;
