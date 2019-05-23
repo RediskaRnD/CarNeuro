@@ -4,7 +4,8 @@
     "target": "es2018",
     "removeComments": false,
     "sourceMap": true,
-    "strict": false
+    "strict": false,
+    "outDir": "static/js"
   },
   "exclude": ["static/tools"]
 }

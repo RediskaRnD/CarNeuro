@@ -3,6 +3,7 @@ import {Track} from "./tools/Track";
 import {Tools} from "./tools";
 import {Car} from "./car";
 import {ColorPoint} from "./tools/ColorPoint";
+import {Utils} from "./utils";
 
 
 // var liaw = new Bezier([1,2,3,4]);
@@ -22,7 +23,7 @@ const eventTrackOnLoad: CustomEvent = new CustomEvent("onLoad");
 
 let lastTimeTick: number = 0;
 let fps: number = 0;
-let requestAnimationId: number | undefined;
+
 let isFollowMode = true;
 
 // =====================================================================================================================
@@ -50,7 +51,7 @@ let crossPointsWithCurve: ColorPoint[] = [];
 // запрос на получения трека
 function getTrack(): void {
 
-    debug("getTrack");
+    Utils.debug("getTrack");
 
     const Http = new XMLHttpRequest();
     let url;
@@ -356,7 +357,7 @@ function drawGrid(): void {
 // перерисовываем экран
 function redrawCanvas(): void {
 
-    if (requestAnimationId) requestAnimationId = requestAnimationFrame(redrawCanvas);
+    if (Utils.requestAnimationId) Utils.requestAnimationId = requestAnimationFrame(redrawCanvas);
 
     cnv.width = cnv.clientWidth;
     cnv.height = cnv.clientHeight;
@@ -486,7 +487,6 @@ function fillVars(): void {
 window.onload = () => {
 
     log = <HTMLElement>document.getElementById("log");
-    log.debug("liaw");
     vars = <HTMLElement>document.getElementById("vars");
     input = <HTMLInputElement>document.getElementById("input");
     cnv = <HTMLCanvasElement>document.getElementById("canvas");
@@ -495,14 +495,14 @@ window.onload = () => {
     lastClickedTarget = cnv;
 
     window.addEventListener("resize", () => {
-        if (requestAnimationId === undefined) redrawCanvas();
+        if (Utils.requestAnimationId === undefined) redrawCanvas();
     });
 
     // =====================================
 
     document.addEventListener("onLoad", function () {
 
-        debug("onLoad");
+        Utils.debug("onLoad"); //TODO ROTO
         // ставим тачку в центр
         offset.x = cnv.width / 2;
         offset.y = cnv.height / 2;
@@ -510,7 +510,7 @@ window.onload = () => {
         // если загрузились все файлы - начинаем подготовку к старту.
 
         if (car.isReady && track) car.restart();
-        if (requestAnimationId === undefined) redrawCanvas();
+        if (Utils.requestAnimationId === undefined) redrawCanvas();
     });
     // =====================================
 
@@ -574,13 +574,13 @@ window.onload = () => {
                     }
                 }
             }
-            if (requestAnimationId === undefined) redrawCanvas();
+            if (Utils.requestAnimationId === undefined) redrawCanvas();
             return;
         }
         if (e.buttons & 4) {    // Middle button
             // переключаем режим следования камеры за машиной
             isFollowMode = !isFollowMode;
-            if (requestAnimationId === undefined) redrawCanvas();
+            if (Utils.requestAnimationId === undefined) redrawCanvas();
         }
     });
     // =====================================
@@ -605,7 +605,7 @@ window.onload = () => {
             offset.y += (e.clientY - mouseDownPoint.y) / scale;
             mouseDownPoint.x = e.clientX;
             mouseDownPoint.y = e.clientY;
-            if (requestAnimationId === undefined) redrawCanvas();
+            if (Utils.requestAnimationId === undefined) redrawCanvas();
         }
         // Middle button
         if (e.buttons & 4) {
@@ -618,7 +618,7 @@ window.onload = () => {
         // e.preventDefault();
         // e.stopPropagation();
         rescaleCanvas(e.deltaY > 0 ? 0.9 : 10 / 9, {x: e.clientX, y: e.clientY});
-        if (requestAnimationId === undefined) redrawCanvas();
+        if (Utils.requestAnimationId === undefined) redrawCanvas();
     }, {passive: true});
     // =====================================
 
@@ -677,13 +677,13 @@ window.onload = () => {
                 switch (redrawRequest) {
                     case 1:
                         // просто перерисовываем канвас
-                        if (requestAnimationId === undefined) redrawCanvas();
+                        if (Utils.requestAnimationId === undefined) redrawCanvas();
                         break;
                     case 2:
                         // запускаем анимацию
-                        if (requestAnimationId === undefined) {
-                            debug("anim+");
-                            requestAnimationId = requestAnimationFrame(redrawCanvas);
+                        if (Utils.requestAnimationId === undefined) {
+                            Utils.debug("anim+");
+                            Utils.requestAnimationId = requestAnimationFrame(redrawCanvas);
                         }
                         break;
                 }
@@ -692,7 +692,7 @@ window.onload = () => {
             case input:
                 if (e.code === "Enter") {
                     e.preventDefault();
-                    debug(input.value);
+                    Utils.debug(input.value);
                     input.value = "";
                 }
                 break;
@@ -715,7 +715,7 @@ window.onload = () => {
     });
     // =====================================
 
-    debug("Andreso loco");
+    Utils.debug("Andreso loco");
     cnv.width = cnv.clientWidth;
     cnv.height = cnv.clientHeight;
 
@@ -728,10 +728,10 @@ window.onload = () => {
     car = new Car(60, 30, 60, 300);
     car.sprite.src = 'https://www.clipartmax.com/png/small/17-172157_racing-car-cartoon-car-top-view.png';
     car.sprite.onload = () => {
-        debug("sprite");
+        Utils.debug("sprite");
         car.isReady = true;
         if (track) car.restart();
-        if (requestAnimationId === undefined) redrawCanvas();
+        if (Utils.requestAnimationId === undefined) redrawCanvas();
     };
 };//version
 // =====================================================================================================================

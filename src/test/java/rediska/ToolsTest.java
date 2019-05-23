@@ -44,27 +44,7 @@ public class ToolsTest {
 
     }
 
-    @org.testng.annotations.Test
-    public void lineToAngle() {
-        final Object[][] args = {
-                {new Point(1,19), (float) 1.0, (float)3.0},
-                {new Point(1,5), (float) 3.1, (float) 1,9}};
 
-
-        for (Object[] arg : args) {
-            final Point point = Tools.lineToAngle((Point) arg[0], (float) arg[1], (float) arg[2]);
-
-            String computedStringValue = convertToString(point);
-            String testName = Thread.currentThread().getStackTrace()[1].getMethodName();
-            String key = Arrays.toString(arg) + testName;
-
-            String cachedValue = getCachedValue(key, computedStringValue);
-            if (cachedValue == null) {
-                continue;
-            }
-            Assert.assertTrue(cachedValue.equals(computedStringValue));
-        }
-    }
     @org.testng.annotations.Test
     public void lineToAngle2() {
         expect(Tools.lineToAngle(new Point(10,-11), 100, (float)3.3), "2");
@@ -78,7 +58,7 @@ public class ToolsTest {
 
     private <T> void expect(T object, String uniqueNumber) {
         String testMethodName = Thread.currentThread().getStackTrace()[2].getMethodName();
-        String valueAsString = convertToString(object);
+        String valueAsString = toString(object);
         String key = testMethodName + "_" + uniqueNumber;
 
         String cachedValue = getCachedValue(key, valueAsString);
@@ -88,16 +68,16 @@ public class ToolsTest {
         Assert.assertTrue(String.format("test number %s", uniqueNumber), cachedValue.equals(valueAsString));
     }
 
-    private <T> String convertToString(T object) {
+    private <T> String toString(T object) {
         return object.toString();
     }
-    private <T> String convertToString(T[] object) {
+    private <T> String toString(T[] object) {
         return Arrays.deepToString(object);
     }
-    private <T> String convertToString(int[] object) {
+    private <T> String toString(int[] object) {
         return Arrays.toString(object);
     }
-    private <T> String convertToString(double[] object) {
+    private <T> String toString(double[] object) {
         return Arrays.toString(object);
     }
 
