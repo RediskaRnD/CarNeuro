@@ -47,7 +47,8 @@ class ToolsTest {
 
 
         for (Object[] arg : args) {
-            String computedResult = convertToString(Tools.lineToAngle((Point) arg[0], (float) arg[1], (float) arg[2]));
+            final Point point = Tools.lineToAngle((Point) arg[0], (float) arg[1], (float) arg[2]);
+            String computedResult = convertToString(point);
             String cachedResult = getCachedResult(computedResult, arg);
             if (cachedResult == null) {
                 continue;
@@ -70,18 +71,13 @@ class ToolsTest {
         return Arrays.toString(object);
     }
 
-    private Integer counter = 0;
     private String lastTestName = null;
 
     private <R,T>  String getCachedResult(String computedResult, T... args ) {
         String testName = Thread.currentThread().getStackTrace()[2].getMethodName();
-        if (! testName.equals(lastTestName)) {
-            lastTestName = testName;
-            counter = 0;
-        }
+        if (! testName.equals(lastTestName)) lastTestName = testName;
 
-        String key = testName + "_" + Arrays.toString(args) + "_" + counter.toString();
-        counter = counter + 1;
+        String key = testName + "_" + Arrays.toString(args);
 
         String value = cachedData.getProperty(key);
         if (value == null) cachedData.setProperty(key, computedResult);
