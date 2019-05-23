@@ -17,7 +17,7 @@ import java.util.Properties;
 class ToolsTest {
 
     private Properties cachedData = new Properties();
-    private final String FILE_NAME =  "C:\\temp\\java\\ToolsTest.txt";
+    private final String FILE_NAME =  "C:\\temp\\java\\" + getClass().getSimpleName() + ".txt";
     private final String COMMENTS = "No Comments";
 
     @BeforeEach
@@ -63,6 +63,7 @@ class ToolsTest {
     @Test
     public void lineToAngle2() {
         expect(Tools.lineToAngle(new Point(1,8), 1, 3), "1");
+        expect(Tools.lineToAngle(new Point(10,-11), 100, (float)3.3), "2");
     }
 
     private <T> void expect(T object, String uniqueNumber) {
@@ -70,7 +71,7 @@ class ToolsTest {
         String valueAsString = convertToString(object);
         String key = testMethodName + "_" + uniqueNumber;
 
-        String cachedValue = getCachedValue(key, valueAsString, );
+        String cachedValue = getCachedValue(key, valueAsString);
         if (cachedValue == null) {
             return;
         }
