@@ -5,11 +5,14 @@ import org.junit.Assert;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeMethod;
 
 import java.awt.*;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.util.Arrays;
 import java.util.Properties;
 
@@ -20,29 +23,32 @@ class ToolsTest {
     private final String FILE_NAME =  "C:\\temp\\java\\" + getClass().getSimpleName() + ".txt";
     private final String COMMENTS = "No Comments";
 
-    @BeforeEach
+    @BeforeMethod
     void setUp() {
-        try (InputStream reader = Files.newInputStream(Path.of(FILE_NAME))){
+        final Path path = Path.of(FILE_NAME);
+        try (InputStream reader = Files.newInputStream(path, StandardOpenOption.CREATE_NEW)){
             cachedData.load(reader);
         } catch (IOException e) {
+//            throw new RuntimeException(e.getCause());
             e.printStackTrace();
         }
     }
 
-    @AfterEach
+    @AfterMethod
     void tearDown() {
-        try (OutputStream writer = Files.newOutputStream(Path.of(FILE_NAME))){
+        final Path path = Path.of(FILE_NAME);
+        try (OutputStream writer = Files.newOutputStream(path)){
             cachedData.store(writer, COMMENTS);
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e.getCause());
         }
 
     }
 
-    @Test
+    @org.testng.annotations.Test
     public void lineToAngle() {
         final Object[][] args = {
-                {new Point(1,8), (float) 1.0, (float)3.0},
+                {new Point(1,19), (float) 1.0, (float)3.0},
                 {new Point(1,5), (float) 3.1, (float) 1,9}};
 
 
@@ -60,7 +66,7 @@ class ToolsTest {
             Assert.assertTrue(cachedValue.equals(computedStringValue));
         }
     }
-    @Test
+    @org.testng.annotations.Test
     public void lineToAngle2() {
         expect(Tools.lineToAngle(new Point(1,8), 1, 3), "1");
         expect(Tools.lineToAngle(new Point(10,-11), 100, (float)3.3), "2");
@@ -91,11 +97,21 @@ class ToolsTest {
         return Arrays.toString(object);
     }
 
-    private String lastTestName = null;
-
     private <R,T>  String getCachedValue(String key, String computedResult) {
         String value = cachedData.getProperty(key);
         if (value == null) cachedData.setProperty(key, computedResult);
         return value;
     }
+
+//    @org.testng.annotations.BeforeMethod
+//    public void setUp() {
+//    }
+//
+//    @org.testng.annotations.AfterMethod
+//    public void tearDown() {
+//    }
+//
+//    @org.testng.annotations.Test
+//    public void testLineToAngle1() {
+//    }
 }
