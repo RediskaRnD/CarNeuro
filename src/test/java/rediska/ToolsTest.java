@@ -1,34 +1,32 @@
 package rediska;
 
 
+import org.apache.commons.io.FileUtils;
 import org.junit.Assert;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 
 import java.awt.*;
-import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.NoSuchFileException;
-import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.Properties;
 
 
-class ToolsTest {
+public class ToolsTest {
 
     private Properties cachedData = new Properties();
     private final String FILE_NAME =  "C:\\temp\\java\\" + getClass().getSimpleName() + ".txt";
     private final String COMMENTS = "No Comments";
 
+
     @BeforeMethod
     void setUp() {
-        final Path path = Path.of(FILE_NAME);
-        if (Files.exists(path)) return;
-        try (InputStream reader = Files.newInputStream(path, StandardOpenOption.CREATE_NEW)){
+        final File path = new File(FILE_NAME);
+        if(!path.exists()) return;
+        try (InputStream reader = FileUtils.openInputStream(path)){
             cachedData.load(reader);
         } catch (IOException e) {
             e.printStackTrace();
@@ -37,8 +35,8 @@ class ToolsTest {
 
     @AfterMethod
     void tearDown() {
-        final Path path = Path.of(FILE_NAME);
-        try (OutputStream writer = Files.newOutputStream(path)){
+        final File path = new File(FILE_NAME);
+        try (OutputStream writer = FileUtils.openOutputStream(path)){
             cachedData.store(writer, COMMENTS);
         } catch (IOException e) {
             e.printStackTrace();
@@ -69,8 +67,13 @@ class ToolsTest {
     }
     @org.testng.annotations.Test
     public void lineToAngle2() {
-        expect(Tools.lineToAngle(new Point(1,8), 1, 3), "1");
         expect(Tools.lineToAngle(new Point(10,-11), 100, (float)3.3), "2");
+        expect(Tools.lineToAngle(new Point(1,8), 1, 3), "1");
+
+    }
+    @org.testng.annotations.Test
+    public void lineToAngle3() {
+        Assert.assertTrue(true);
     }
 
     private <T> void expect(T object, String uniqueNumber) {
@@ -82,7 +85,7 @@ class ToolsTest {
         if (cachedValue == null) {
             return;
         }
-        Assert.assertTrue(cachedValue.equals(valueAsString));
+        Assert.assertTrue(String.format("test number %s", uniqueNumber), cachedValue.equals(valueAsString));
     }
 
     private <T> String convertToString(T object) {

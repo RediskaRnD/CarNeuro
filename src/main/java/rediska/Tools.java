@@ -1,7 +1,6 @@
 package rediska;
 
 import java.awt.*;
-import java.util.UUID;
 
 public class Tools {
 
