@@ -9,17 +9,15 @@ import tools.Point;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.Properties;
 
 
 public class TrackGeneratorTest {
-    Point point;
 
     @Before
     public void setUp() throws Exception {
-        point = new Point();
-        point.x = 3;
-        point.y = 4;
+
     }
 
     @After
@@ -28,43 +26,46 @@ public class TrackGeneratorTest {
 
     @Test
     public void getTrack() {
-        Properties expected = new Properties();
-        expect(liaw(1,200,5), "1"));
-        expect(liaw(1,200,10), "2"));
-        expect(liaw(1,200,5),));
-        Assert.assertEquals(liaw(1,0,5), expected.get(2));
-        Assert.assertEquals(liaw(100,2,15), expected.get(3));
-    }
-    @Test
-    public void PoinTest() {
-        Properties expected = new Properties();
-        expect(liaw(1,200,5), "5"));
-        expect(liaw(1,200,10), "2"));
-        expect(liaw(1,200,5),));
-        Assert.assertEquals(liaw(1,0,5), expected.get(2));
-        Assert.assertEquals(liaw(100,2,15), expected.get(3));
-    }
+        final Object[][] args = {{1, 2}, {100, 3.1}};
 
-    private boolean expect(double liaw, String s) {
-        Properties properties = new Properties();
-        try {
-            properties.load(Files.newInputStream(Path.of("get_track.txt")));
-            String result = properties.getProperty(s);
-            if(result == null) {
-                properties.setProperty(s, String.valueOf(liaw));
-                return true;
+        final TrackGenerator trackGenerator = new TrackGenerator();
+        for (Object[] arg : args) {
+            String computedResult = convertToString(trackGenerator.getTrack());
+            String cachedResult = getCachedResult(computedResult);
+            if (cachedResult == null) {
+                continue;
             }
-            return result == String.valueOf(liaw);
+            Assert.assertTrue(cachedResult.equals(computedResult));
 
-        } catch (IOException e) {
-            e.printStackTrace();
         }
     }
 
+    private <T> String convertToString(T object) {
+        return object.toString();
+    }
+    private <T> String convertToString(T[] object) {
+        return Arrays.deepToString(object);
+    }
+    private <T> String convertToString(int[] object) {
+        return Arrays.toString(object);
+    }
+    private <T> String convertToString(double[] object) {
+        return Arrays.toString(object);
+    }
 
-
-    private double liaw(int a, int b, int c) {
-        return a/b+c;
+    private Integer counter = 0;
+    private String lastTestName = null;
+    private Properties cachedData = new Properties();
+    private <R,T>  String getCachedResult(String computedResult, T... args ) {
+        String testName = Thread.currentThread().getStackTrace()[1].getMethodName();
+        if (! testName.equals(lastTestName)) {
+            lastTestName = testName;
+            counter = 0;
+        }
+        String key = args.toString();
+        String value = cachedData.getProperty(key);
+        if (value == null) cachedData.setProperty(key, computedResult);
+        return value;
     }
 
 }
