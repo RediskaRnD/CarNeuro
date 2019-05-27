@@ -1,6 +1,6 @@
 import {Point} from "./tools/Point";
 
-export class Tools {
+export class Tools { //TODO ROTO
 
     // =====================================
     //векторное произведение
