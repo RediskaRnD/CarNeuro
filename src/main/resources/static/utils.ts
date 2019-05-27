@@ -1,7 +1,11 @@
 // =====================================================================================================================
+import {Track} from "./tools/Track";
+
 export class Utils {
     private static log: any = document.getElementById("log");
     public static requestAnimationId: number | undefined;
+    // Дорога
+    public static track: Track;
     static debug(str: string): void {
 
         // проверка положения скрола

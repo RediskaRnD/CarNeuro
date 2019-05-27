@@ -33,8 +33,7 @@ let scale: number = 1;                              // Масштаб
 let offset: Point = {x: 0, y: 0};                   // Смещение видимой области (он логический! - масштабируется согласно scale)
 let virtualMousePosition: Point = {x: 0, y: 0};   // Положение мышки в виртуальной системе координат
 
-// Дорога
-let track: Track;
+
 // Тачка
 let car: Car;
 // Линии
@@ -65,7 +64,7 @@ function getTrack(): void {
     Http.onload = () => {
         if (Http.readyState === Http.DONE) {
             if (Http.status === 200) {
-                track = new Track(Http.response.track);
+                Utils.track = new Track(Http.response.track);
                 document.dispatchEvent(eventTrackOnLoad);
             }
         }
@@ -81,8 +80,8 @@ function researchCrossPointsWithCurve(): void {
     crossPointsWithCurve = [];
 
     // проверка пересечений с кривой
-    if (track) {
-        const tLen = track.len;
+    if (Utils.track) {
+        const tLen = Utils.track.len;
         if (tLen < 2) return;
 
         // поиск ведем по левой и правой сторонам трека
@@ -93,8 +92,8 @@ function researchCrossPointsWithCurve(): void {
             for (let i = 0; i < numOfPoints - 1; i += 2) {
                 for (let j = 0; j < tLen - 1; j++) {
                     let p = Tools.searchCrossPoints(
-                        track.p[tr][j],
-                        track.p[tr][j + 1],
+                        Utils.track.p[tr][j],
+                        Utils.track.p[tr][j + 1],
                         pointsOfLines[i],
                         pointsOfLines[i + 1]
                     );
@@ -160,8 +159,8 @@ function drawLines(): void {
 // отрисовка трека
 function drawTrack(): void {
 
-    if (!track === undefined) return;
-    let p: Point[][] = track.p;
+    if (!Utils.track === undefined) return;
+    let p: Point[][] = Utils.track.p;
     // рисуем обочину
     ctx.lineWidth = Math.round(10 * scale);
     ctx.strokeStyle = "#444444";
@@ -199,7 +198,7 @@ function drawTrack(): void {
     // ищем левую часть вышедшую за экран
     let cp: Point = physicalToLogical({x: cnv.width, y: cnv.height});
     let bPrevIn: boolean | undefined = undefined;
-    for (let i = 0; i < track.len; i++) {
+    for (let i = 0; i < Utils.track.len; i++) {
         let tp = p[1][i];
         if (tp.x < -offset.x || tp.x > cp.x || tp.y < -offset.y || tp.y > cp.y) {
             // мы за границей экрана
@@ -223,7 +222,7 @@ function drawTrack(): void {
     ctx.stroke();
     ctx.beginPath();
     bPrevIn = undefined;
-    for (let i = 0; i < track.len; i++) {
+    for (let i = 0; i < Utils.track.len; i++) {
         let tp = p[2][i];
         if (tp.x < -offset.x || tp.x > cp.x || tp.y < -offset.y || tp.y > cp.y) {
             // мы за границей экрана
@@ -372,11 +371,11 @@ function redrawCanvas(): void {
     if (dt > 0.1 && car.speed == 0) dt = 0.01;
     car.calcPosition(dt);
     // проверка на выезд за трассу
-    if (car.checkCollisions(track) == true) {
+    if (car.checkCollisions(Utils.track) == true) {
         //car.speed = 0;
         car.recoil(dt);
     }
-    car.updateProgress(track);
+    car.updateProgress(Utils.track);
 
     if (isFollowMode == true) {
         // помещаем тачку в центр
@@ -390,7 +389,7 @@ function redrawCanvas(): void {
         offset.y += yOff / scale;
     }
     fillVars();
-    if (track) drawTrack();
+    if (Utils.track) drawTrack();
     drawLines();
     drawCrossPoints();
     //drawGrid();
@@ -502,14 +501,14 @@ window.onload = () => {
 
     document.addEventListener("onLoad", function () {
 
-        Utils.debug("onLoad"); //TODO ROTO
+        Utils.debug("onLoad");
         // ставим тачку в центр
         offset.x = cnv.width / 2;
         offset.y = cnv.height / 2;
         researchCrossPointsWithCurve();
         // если загрузились все файлы - начинаем подготовку к старту.
 
-        if (car.isReady && track) car.restart();
+        if (car.isReady && Utils.track) car.restart();
         if (Utils.requestAnimationId === undefined) redrawCanvas();
     });
     // =====================================
@@ -534,14 +533,14 @@ window.onload = () => {
 
             if (numOfPoints % 2 == 0) {
                 // проверка пересечений с кривой
-                if (track) {
+                if (Utils.track) {
                     for (let tr = 1; tr < 3; tr++) {
-                        const len = track.len;
+                        const len = Utils.track.len;
 
                         for (let i = 0; i < len - 1; i++) {
                             let p = Tools.searchCrossPoints(
-                                track.p[tr][i],
-                                track.p[tr][i + 1],
+                                Utils.track.p[tr][i],
+                                Utils.track.p[tr][i + 1],
                                 pointsOfLines[numOfPoints - 2],
                                 pointsOfLines[numOfPoints - 1]
                             );
@@ -730,7 +729,7 @@ window.onload = () => {
     car.sprite.onload = () => {
         Utils.debug("sprite");
         car.isReady = true;
-        if (track) car.restart();
+        if (Utils.track) car.restart();
         if (Utils.requestAnimationId === undefined) redrawCanvas();
     };
 };//version

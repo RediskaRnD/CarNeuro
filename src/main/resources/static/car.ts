@@ -1,10 +1,9 @@
 import {Point} from "./tools/Point";
 import {Tools} from "./tools";
 import {Track} from "./tools/Track";
+import {Utils} from "./utils";
 
-declare function debug(str: string): void;
-declare let track: Track;
-declare let requestAnimationId: number | undefined;
+// declare let track: Track;
 
 export class Car {
 
@@ -168,10 +167,10 @@ export class Car {
             }
         }
         // машина не двигается и колёса стоят ровно, останавливаем анимацию
-        if ((this.keys == 0) && (v == 0) && (this._wheelAngle == 0) && requestAnimationId) {
-            cancelAnimationFrame(requestAnimationId);
-            requestAnimationId = undefined;
-            debug("anim-");
+        if ((this.keys == 0) && (v == 0) && (this._wheelAngle == 0) && Utils.requestAnimationId) {
+            cancelAnimationFrame(Utils.requestAnimationId);
+            Utils.requestAnimationId = undefined;
+            Utils.debug("anim-");
         }
 
         let s = dt * this.speed;    // пройденный путь за dt
@@ -258,9 +257,9 @@ export class Car {
     // подготовка к старту
     restart(): void {
 
-        debug("Restart");
+        Utils.debug("Restart");
         this.p = {x: 0, y: 0};
-        this.angle = Tools.angleByPoints(track.p[0][0], track.p[0][1]);
+        this.angle = Tools.angleByPoints(Utils.track.p[0][0], Utils.track.p[0][1]);
         this.wheelAngle = 0;
         this.speed = 0;
         this.time = 0;
