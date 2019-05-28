@@ -5,7 +5,6 @@ package tools;
 
 public class Track {
 
-//    @Module("liaw")
     public Point[][] p;
     public int len = 0;
     public int xMin = 0;
