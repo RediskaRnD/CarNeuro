@@ -2,6 +2,7 @@ package rediska;
 
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.junit.Assert;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
@@ -61,9 +62,11 @@ public class ToolsTest {
         //Check for duplicate uniqueNumber
         if (!uniqueNumbers.add(uniqueNumber)) throw new IllegalArgumentException("uniqueNumber is already used");
 
-        //cache key is made from testMethodName + uniqueNumber
+        //cache key is made from testMethodName + uniqueNumber (its hack)
         String testMethodName = Thread.currentThread().getStackTrace()[2].getMethodName();
-        String valueAsString = toString(object);
+
+        //using ArrayUtils.toString for converting Template arguments, which could be array of primitives etc..
+        String valueAsString = ArrayUtils.toString(object);
         String key = testMethodName + "_" + uniqueNumber.toString();
 
         String cachedValue = getCachedValue(key, valueAsString);
@@ -73,7 +76,7 @@ public class ToolsTest {
         Assert.assertEquals(String.format("RegressionTest uniqueNumber - %d", uniqueNumber), cachedValue, valueAsString);
     }
 
-    //TODO refactor toString method to ArrayUtils.toString() ?
+    //TODO remove helper methods toString?
     private <T> String toString(T object) {
         return object.toString();
     }
