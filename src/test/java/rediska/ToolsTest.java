@@ -12,7 +12,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Properties;
+import java.util.Set;
 
 
 public class ToolsTest {
@@ -20,10 +22,12 @@ public class ToolsTest {
     private Properties cachedData = new Properties();
     private final String FILE_NAME =  "C:\\temp\\java\\" + getClass().getSimpleName() + ".txt";
     private final String COMMENTS = "No Comments";
+    private final Set<Integer> uniqueNumbers = new HashSet<>();
 
-
+    //TODO refactor setup and helper methods to helper class
     @BeforeMethod
     void setUp() {
+        uniqueNumbers.clear();
         final File path = new File(FILE_NAME);
         if(!path.exists()) return;
         try (InputStream reader = FileUtils.openInputStream(path)){
@@ -46,28 +50,30 @@ public class ToolsTest {
 
 
     @org.testng.annotations.Test
-    public void lineToAngle2() {
-        expect(Tools.lineToAngle(new Point(10,-11), 100, (float)3.3), "2");
-        expect(Tools.lineToAngle(new Point(1,8), 1, 3), "1");
+    public void lineToAngle() {
+        regressionTest(Tools.lineToAngle(new Point(10,-11), 100, (float)3.3), 1);
+        regressionTest(Tools.lineToAngle(new Point(1,8), 1, 3), 2);
 
     }
-    @org.testng.annotations.Test
-    public void lineToAngle3() {
-        Assert.assertTrue(true);
-    }
 
-    private <T> void expect(T object, String uniqueNumber) {
+
+    private <T> void regressionTest(T object, Integer uniqueNumber) {
+        //Check for duplicate uniqueNumber
+        if (!uniqueNumbers.add(uniqueNumber)) throw new IllegalArgumentException("uniqueNumber is already used");
+
+        //cache key is made from testMethodName + uniqueNumber
         String testMethodName = Thread.currentThread().getStackTrace()[2].getMethodName();
         String valueAsString = toString(object);
-        String key = testMethodName + "_" + uniqueNumber;
+        String key = testMethodName + "_" + uniqueNumber.toString();
 
         String cachedValue = getCachedValue(key, valueAsString);
         if (cachedValue == null) {
             return;
         }
-        Assert.assertTrue(String.format("test number %s", uniqueNumber), cachedValue.equals(valueAsString));
+        Assert.assertEquals(String.format("RegressionTest uniqueNumber - %d", uniqueNumber), cachedValue, valueAsString);
     }
 
+    //TODO refactor toString method to ArrayUtils.toString() ?
     private <T> String toString(T object) {
         return object.toString();
     }
@@ -87,15 +93,4 @@ public class ToolsTest {
         return value;
     }
 
-//    @org.testng.annotations.BeforeMethod
-//    public void setUp() {
-//    }
-//
-//    @org.testng.annotations.AfterMethod
-//    public void tearDown() {
-//    }
-//
-//    @org.testng.annotations.Test
-//    public void testLineToAngle1() {
-//    }
 }
