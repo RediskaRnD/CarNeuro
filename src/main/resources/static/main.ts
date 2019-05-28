@@ -4,6 +4,7 @@ import {Tools} from "./tools";
 import {Car} from "./car";
 import {ColorPoint} from "./tools/ColorPoint";
 import {Utils} from "./utils";
+import {Line} from "./tools/Line";
 
 
 // var liaw = new Bezier([1,2,3,4]);
@@ -91,7 +92,7 @@ function researchCrossPointsWithCurve(): void {
             // идём по всем точкам линий
             for (let i = 0; i < numOfPoints - 1; i += 2) {
                 for (let j = 0; j < tLen - 1; j++) {
-                    let p = Tools.searchCrossPoints(
+                    let p = Line.getCrossPoints(
                         Utils.track.p[tr][j],
                         Utils.track.p[tr][j + 1],
                         pointsOfLines[i],
@@ -538,7 +539,7 @@ window.onload = () => {
                         const len = Utils.track.len;
 
                         for (let i = 0; i < len - 1; i++) {
-                            let p = Tools.searchCrossPoints(
+                            let p = Line.getCrossPoints(
                                 Utils.track.p[tr][i],
                                 Utils.track.p[tr][i + 1],
                                 pointsOfLines[numOfPoints - 2],
@@ -557,7 +558,7 @@ window.onload = () => {
                 if (numOfPoints > 3) {
                     // поиск новых пересечений с себе подобными
                     for (let i = 0; i < numOfPoints - 3; i += 2) {
-                        let p = Tools.searchCrossPoints(
+                        let p = Line.getCrossPoints(
                             pointsOfLines[i],
                             pointsOfLines[i + 1],
                             pointsOfLines[numOfPoints - 2],

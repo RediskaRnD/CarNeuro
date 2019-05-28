@@ -6,7 +6,7 @@
       "lastUpdateTimestamp": 1556561830000,
       "modelVersion": "unknown",
       "transpilerVersion": "${jsweet.transpiler.version}",
-      "jsOutputDirPath": "C:\\Users\\Rediska\\IdeaProjects\\Car NN\\Java to TS\\.jsweet\\candies\\js",
+      "jsOutputDirPath": "C:\\Users\\Rediska\\IdeaProjects\\Car NN\\Java To TS\\.jsweet\\candies\\js",
       "jsDirPath": "META-INF/resources/webjars/jsweet-core/6.0.1-SNAPSHOT",
       "jsFilesPaths": []
     },
@@ -16,7 +16,7 @@
       "lastUpdateTimestamp": 1501691400000,
       "modelVersion": "unknown",
       "transpilerVersion": "2.0.0",
-      "jsOutputDirPath": "C:\\Users\\Rediska\\IdeaProjects\\Car NN\\Java to TS\\.jsweet\\candies\\js",
+      "jsOutputDirPath": "C:\\Users\\Rediska\\IdeaProjects\\Car NN\\Java To TS\\.jsweet\\candies\\js",
       "jsDirPath": "META-INF/resources/webjars/marked/0.0.0-20170726",
       "jsFilesPaths": []
     },
@@ -26,7 +26,7 @@
       "lastUpdateTimestamp": 1501691230000,
       "modelVersion": "unknown",
       "transpilerVersion": "2.0.0",
-      "jsOutputDirPath": "C:\\Users\\Rediska\\IdeaProjects\\Car NN\\Java to TS\\.jsweet\\candies\\js",
+      "jsOutputDirPath": "C:\\Users\\Rediska\\IdeaProjects\\Car NN\\Java To TS\\.jsweet\\candies\\js",
       "jsDirPath": "META-INF/resources/webjars/angular-route/1.2.0-20170726",
       "jsFilesPaths": []
     },
@@ -36,7 +36,7 @@
       "lastUpdateTimestamp": 1501085030000,
       "modelVersion": "unknown",
       "transpilerVersion": "2.0.0",
-      "jsOutputDirPath": "C:\\Users\\Rediska\\IdeaProjects\\Car NN\\Java to TS\\.jsweet\\candies\\js",
+      "jsOutputDirPath": "C:\\Users\\Rediska\\IdeaProjects\\Car NN\\Java To TS\\.jsweet\\candies\\js",
       "jsDirPath": "META-INF/resources/webjars/angular/1.4.0-20170726",
       "jsFilesPaths": []
     },
@@ -46,7 +46,7 @@
       "lastUpdateTimestamp": 1501691304000,
       "modelVersion": "unknown",
       "transpilerVersion": "2.0.0",
-      "jsOutputDirPath": "C:\\Users\\Rediska\\IdeaProjects\\Car NN\\Java to TS\\.jsweet\\candies\\js",
+      "jsOutputDirPath": "C:\\Users\\Rediska\\IdeaProjects\\Car NN\\Java To TS\\.jsweet\\candies\\js",
       "jsDirPath": "META-INF/resources/webjars/jquery/1.10.0-20170726",
       "jsFilesPaths": []
     },
@@ -56,9 +56,22 @@
       "lastUpdateTimestamp": 1501691324000,
       "modelVersion": "unknown",
       "transpilerVersion": "2.0.0",
-      "jsOutputDirPath": "C:\\Users\\Rediska\\IdeaProjects\\Car NN\\Java to TS\\.jsweet\\candies\\js",
+      "jsOutputDirPath": "C:\\Users\\Rediska\\IdeaProjects\\Car NN\\Java To TS\\.jsweet\\candies\\js",
       "jsDirPath": "META-INF/resources/webjars/knockout/3.4.0-20170726",
       "jsFilesPaths": []
+    },
+    {
+      "name": "j4ts",
+      "version": "0.5.0",
+      "lastUpdateTimestamp": 1505361346000,
+      "modelVersion": "unknown",
+      "transpilerVersion": "2.0.0",
+      "jsOutputDirPath": "C:\\Users\\Rediska\\IdeaProjects\\Car NN\\Java To TS\\.jsweet\\candies\\js",
+      "jsDirPath": "META-INF/resources/webjars/j4ts/0.5.0",
+      "jsFilesPaths": [
+        "META-INF/resources/webjars/j4ts/0.5.0/.tsc-rootfile.js",
+        "META-INF/resources/webjars/j4ts/0.5.0/bundle.js"
+      ]
     },
     {
       "name": "backbone",
@@ -66,7 +79,7 @@
       "lastUpdateTimestamp": 1501691246000,
       "modelVersion": "unknown",
       "transpilerVersion": "2.0.0",
-      "jsOutputDirPath": "C:\\Users\\Rediska\\IdeaProjects\\Car NN\\Java to TS\\.jsweet\\candies\\js",
+      "jsOutputDirPath": "C:\\Users\\Rediska\\IdeaProjects\\Car NN\\Java To TS\\.jsweet\\candies\\js",
       "jsDirPath": "META-INF/resources/webjars/backbone/1.3.0-20170726",
       "jsFilesPaths": []
     },
@@ -76,7 +89,7 @@
       "lastUpdateTimestamp": 1501691276000,
       "modelVersion": "unknown",
       "transpilerVersion": "2.0.0",
-      "jsOutputDirPath": "C:\\Users\\Rediska\\IdeaProjects\\Car NN\\Java to TS\\.jsweet\\candies\\js",
+      "jsOutputDirPath": "C:\\Users\\Rediska\\IdeaProjects\\Car NN\\Java To TS\\.jsweet\\candies\\js",
       "jsDirPath": "META-INF/resources/webjars/underscore/1.7.0-20170726",
       "jsFilesPaths": []
     }

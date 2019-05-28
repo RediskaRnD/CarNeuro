@@ -2,6 +2,7 @@ import {Point} from "./tools/Point";
 import {Tools} from "./tools";
 import {Track} from "./tools/Track";
 import {Utils} from "./utils";
+import {Line} from "./tools/Line";
 
 // declare let track: Track;
 
@@ -45,7 +46,7 @@ export class Car {
         this.maxSpeed = maxSpeed;
 
         this.r = Math.sqrt(this.height * this.height + this.width * this.width) / 2;
-        this.a = Tools.angleByPoints({x: 0, y: 0}, {x: this.width / 2, y: this.height / 2});
+        this.a = Point.angleByPoints({x: 0, y: 0}, {x: this.width / 2, y: this.height / 2});
 
         this.ackerA = Infinity;
         this.ackerR = Infinity;
@@ -61,11 +62,11 @@ export class Car {
     set p(value: Point) {
 
         // находим разницу между положением прошлым и настоящим
-        let dp = Tools.sub(value, this._p);
+        let dp = Point.sub(value, this._p);
         this._p = value;
         // добавляем разницу к крайним точкам тачки
         for (let i = 0; i < 4; i++) {
-            this.cornerP[i] = Tools.sum(this.cornerP[i], dp);
+            this.cornerP[i] = Point.sum(this.cornerP[i], dp);
         }
     }
 
@@ -86,7 +87,7 @@ export class Car {
             let ackerL = this.width / Math.tan(this._wheelAngle);
             this.ackerR = Math.sqrt(this.width * this.width / 4 + ackerL * ackerL);
             this.ackerA = this._angle + (Math.asin(this.width / (2 * this.ackerR)) + Math.PI / 2) * (this._wheelAngle > 0 ? 1 : -1);
-            this.ackerP = Tools.lineToAngle(this._p, this.ackerR, this.ackerA);
+            this.ackerP = Point.getPointByAngle(this._p, this.ackerR, this.ackerA);
         }
     }
 
@@ -99,10 +100,10 @@ export class Car {
     set angle(value: number) {
         this._angle = value;
         // Находим крайние точки тачки.
-        this.cornerP[0] = (Tools.lineToAngle(this._p, this.r, this._angle + this.a));
-        this.cornerP[1] = (Tools.lineToAngle(this._p, this.r, this._angle - this.a));
-        this.cornerP[2] = (Tools.lineToAngle(this._p, this.r, this._angle + this.a + Math.PI));
-        this.cornerP[3] = (Tools.lineToAngle(this._p, this.r, this._angle - this.a + Math.PI));
+        this.cornerP[0] = (Point.getPointByAngle(this._p, this.r, this._angle + this.a));
+        this.cornerP[1] = (Point.getPointByAngle(this._p, this.r, this._angle - this.a));
+        this.cornerP[2] = (Point.getPointByAngle(this._p, this.r, this._angle + this.a + Math.PI));
+        this.cornerP[3] = (Point.getPointByAngle(this._p, this.r, this._angle - this.a + Math.PI));
     }
 
     // =====================================
@@ -181,9 +182,9 @@ export class Car {
             // поворачиваем корпус тачки
             this.angle += dAngle;
             // находим новую позицию тачки
-            this.p = Tools.lineToAngle(this.ackerP, this.ackerR, (this.ackerA + dAngle + Math.PI));
+            this.p = Point.getPointByAngle(this.ackerP, this.ackerR, (this.ackerA + dAngle + Math.PI));
         } else {
-            this.p = Tools.lineToAngle(this._p, this.speed * dt, this._angle);
+            this.p = Point.getPointByAngle(this._p, this.speed * dt, this._angle);
         }
         this.wheelAngle
     }
@@ -206,10 +207,10 @@ export class Car {
         // проверяем обе стороны
         for (let i = 1; i < 3; i++) {
             for (let j = iMin; j < iMax; j++) {
-                if (Tools.linesCrossing(track.p[i][j], track.p[i][j + 1], this.cornerP[0], this.cornerP[1]) == true) return true;
-                if (Tools.linesCrossing(track.p[i][j], track.p[i][j + 1], this.cornerP[1], this.cornerP[2]) == true) return true;
-                if (Tools.linesCrossing(track.p[i][j], track.p[i][j + 1], this.cornerP[2], this.cornerP[3]) == true) return true;
-                if (Tools.linesCrossing(track.p[i][j], track.p[i][j + 1], this.cornerP[3], this.cornerP[0]) == true) return true;
+                if (Line.isCrossing(track.p[i][j], track.p[i][j + 1], this.cornerP[0], this.cornerP[1]) == true) return true;
+                if (Line.isCrossing(track.p[i][j], track.p[i][j + 1], this.cornerP[1], this.cornerP[2]) == true) return true;
+                if (Line.isCrossing(track.p[i][j], track.p[i][j + 1], this.cornerP[2], this.cornerP[3]) == true) return true;
+                if (Line.isCrossing(track.p[i][j], track.p[i][j + 1], this.cornerP[3], this.cornerP[0]) == true) return true;
             }
         }
         // надо будет потом найти место столкновения
@@ -225,9 +226,9 @@ export class Car {
         if (this.stage < track.len - 1) {
             st = this.stage + 1;
             // проверяем диагонали на пересечение зебры
-            if (Tools.linesCrossing(track.p[1][st], track.p[2][st], this.cornerP[0], this.cornerP[2]) == true
+            if (Line.isCrossing(track.p[1][st], track.p[2][st], this.cornerP[0], this.cornerP[2]) == true
                 ||
-                Tools.linesCrossing(track.p[1][st], track.p[2][st], this.cornerP[1], this.cornerP[3]) == true) {
+                Line.isCrossing(track.p[1][st], track.p[2][st], this.cornerP[1], this.cornerP[3]) == true) {
                 this.stage = st;
                 return;
             }
@@ -236,9 +237,9 @@ export class Car {
         if (this.stage > 0) {
             st = this.stage - 1;
             // проверяем диагонали на пересечение зебры
-            if (Tools.linesCrossing(track.p[1][st], track.p[2][st], this.cornerP[0], this.cornerP[2]) == true
+            if (Line.isCrossing(track.p[1][st], track.p[2][st], this.cornerP[0], this.cornerP[2]) == true
                 ||
-                Tools.linesCrossing(track.p[1][st], track.p[2][st], this.cornerP[1], this.cornerP[3]) == true) {
+                Line.isCrossing(track.p[1][st], track.p[2][st], this.cornerP[1], this.cornerP[3]) == true) {
                 this.stage = st;
                 return;
             }
@@ -249,7 +250,7 @@ export class Car {
     // отскок машины от препятствия
     recoil(dt: number): void {
 
-        this.p = Tools.lineToAngle(this._p, this.speed * dt * 2, this._angle - Math.PI);
+        this.p = Point.getPointByAngle(this._p, this.speed * dt * 2, this._angle - Math.PI);
         this.speed = -this.speed / 3;
     }
 
@@ -259,12 +260,11 @@ export class Car {
 
         Utils.debug("Restart");
         this.p = {x: 0, y: 0};
-        this.angle = Tools.angleByPoints(Utils.track.p[0][0], Utils.track.p[0][1]);
+        this.angle = Point.angleByPoints(Utils.track.p[0][0], Utils.track.p[0][1]);
         this.wheelAngle = 0;
         this.speed = 0;
         this.time = 0;
         this.stage = 0;
         this.fuel = 1;
-
     }
 }

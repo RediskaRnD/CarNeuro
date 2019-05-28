@@ -81,6 +81,11 @@
     <dependencies>
         <dependency>
             <groupId>org.jsweet</groupId>
+            <artifactId>j4ts</artifactId>
+            <version>RELEASE</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jsweet</groupId>
             <artifactId>jsweet-core</artifactId>
             <version>6.0.1-SNAPSHOT</version>
         </dependency>
