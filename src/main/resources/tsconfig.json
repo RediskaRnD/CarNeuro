@@ -6,6 +6,6 @@
     "sourceMap": true,
     "strict": false,
     "outDir": "static/js"
-  },
-  "exclude": ["static/tools"]
+  }
+//  "exclude": ["static/tools"]
 }

@@ -1,9 +1,11 @@
 HELP.md
-/target/
+/Java To TS/.jsweet/
 /Java To TS/target/
+/node_modules/
+/.tscache/
 !.mvn/wrapper/maven-wrapper.jar
-*.js
-*.map
+**/*.js
+**/*.map
 ### STS ###
 .apt_generated
 .classpath

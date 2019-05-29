@@ -31,8 +31,8 @@ export class Point {
 
     public static getPointByAngle(p : Point, length : number, angle : number) : Point {
         let p2 : Point = new Point();
-        p2.x = p.x + (<number>(length * Math.cos(angle))|0);
-        p2.y = p.y + (<number>(length * Math.sin(angle))|0);
+        p2.x = p.x + length * Math.cos(angle);
+        p2.y = p.y + length * Math.sin(angle);
         return p2;
     }
 

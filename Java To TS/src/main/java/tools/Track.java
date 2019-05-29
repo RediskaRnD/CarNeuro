@@ -7,10 +7,10 @@ public class Track {
 
     public Point[][] p;
     public int len = 0;
-    public int xMin = 0;
-    public int xMax = 0;
-    public int yMin = 0;
-    public int yMax = 0;
+    public double xMin = 0;
+    public double xMax = 0;
+    public double yMin = 0;
+    public double yMax = 0;
 
     public Track(Point[][] track) {
 
