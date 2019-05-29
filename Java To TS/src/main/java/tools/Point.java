@@ -11,14 +11,14 @@ public class Point {
     public static Point sub(Point p1, Point p2) {
         Point point = new Point();
         point.x = p1.x - p2.x;
-        point.y = p2.y - p2.y;
+        point.y = p1.y - p2.y;
         return point;
     }
 
     public static Point sum(Point p1, Point p2) {
         Point point = new Point();
         point.x = p1.x + p2.x;
-        point.y = p2.y + p2.y;
+        point.y = p1.y + p2.y;
         return point;
     }
 

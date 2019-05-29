@@ -13,13 +13,13 @@ define(["require", "exports"], function (require, exports) {
         static sub(p1, p2) {
             let point = new Point();
             point.x = p1.x - p2.x;
-            point.y = p2.y - p2.y;
+            point.y = p1.y - p2.y;
             return point;
         }
         static sum(p1, p2) {
             let point = new Point();
             point.x = p1.x + p2.x;
-            point.y = p2.y + p2.y;
+            point.y = p1.y + p2.y;
             return point;
         }
         static angleByPoints(p1, p2) {

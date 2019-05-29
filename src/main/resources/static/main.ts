@@ -1,6 +1,5 @@
 import {Point} from "./tools/Point";
 import {Track} from "./tools/Track";
-import {Tools} from "./tools";
 import {Car} from "./car";
 import {ColorPoint} from "./tools/ColorPoint";
 import {Utils} from "./utils";
@@ -58,7 +57,7 @@ function getTrack(): void {
     if (window.location.hostname === "localhost") {
         url = 'http://localhost/getdata';
     } else {
-        url = 'http://95.22.204.162/getdata';
+        url = 'http://95.22.195.62/getdata';
     }
     Http.open("GET", url);
     Http.responseType = "json";
@@ -635,19 +634,19 @@ window.onload = () => {
             case cnv:
                 let redrawRequest = 0;
                 // управление машиной
-                if (e.code === "KeyW") {
+                if (e.code === "KeyW" || e.code === "ArrowUp") {
                     car.keys |= 1;
                     redrawRequest = 2;
                 }
-                if (e.code === "KeyS") {
+                if (e.code === "KeyS" || e.code === "ArrowDown") {
                     car.keys |= 2;
                     redrawRequest = 2;
                 }
-                if (e.code === "KeyA") {
+                if (e.code === "KeyA" || e.code === "ArrowLeft") {
                     car.keys |= 4;
                     redrawRequest = redrawRequest > 1 ? redrawRequest : 1;
                 }
-                if (e.code === "KeyD") {
+                if (e.code === "KeyD" || e.code === "ArrowRight") {
                     car.keys |= 8;
                     redrawRequest = redrawRequest > 1 ? redrawRequest : 1;
                 }
@@ -705,10 +704,10 @@ window.onload = () => {
     document.addEventListener("keyup", function (e) {
 
         if (e.target === cnv) {
-            if (e.code === "KeyW") car.keys &= ~1;
-            if (e.code === "KeyS") car.keys &= ~2;
-            if (e.code === "KeyA") car.keys &= ~4;
-            if (e.code === "KeyD") car.keys &= ~8;
+            if (e.code === "KeyW" || e.code === "ArrowUp") car.keys &= ~1;
+            if (e.code === "KeyS" || e.code === "ArrowDown") car.keys &= ~2;
+            if (e.code === "KeyA" || e.code === "ArrowLeft") car.keys &= ~4;
+            if (e.code === "KeyD" || e.code === "ArrowRight") car.keys &= ~8;
             if (e.code === "KeyQ") car.keys &= ~16;
             if (e.code === "KeyE") car.keys &= ~32;
         }

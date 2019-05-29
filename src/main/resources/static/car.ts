@@ -1,5 +1,4 @@
 import {Point} from "./tools/Point";
-import {Tools} from "./tools";
 import {Track} from "./tools/Track";
 import {Utils} from "./utils";
 import {Line} from "./tools/Line";
