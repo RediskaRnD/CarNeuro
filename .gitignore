@@ -3,8 +3,9 @@ HELP.md
 /Java To TS/target/
 /node_modules/
 /.tscache/
-!.mvn/wrapper/maven-wrapper.jar
+#!.mvn/wrapper/maven-wrapper.jar
 **/*.js
+!Gruntfile.js
 **/*.map
 ### STS ###
 .apt_generated
