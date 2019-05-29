@@ -1,6 +1,8 @@
 HELP.md
 /target/
 /Java To TS/target/
+*.js
+*.map
 !.mvn/wrapper/maven-wrapper.jar
 
 ### STS ###
