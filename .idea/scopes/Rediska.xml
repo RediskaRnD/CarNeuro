@@ -1,0 +1,3 @@
+<component name="DependencyValidationManager">
+  <scope name="Rediska" pattern="file[Car NN]:src/main/java//*||file[Car NN]:src/main/resources//*||file[Car NN]:src/test//*||file[Car NN]:pom.xml||file[Java To TS]:pom.xml||file[Java To TS]:src/main/java//*||file[Java To TS]:src/test/java//*" />
+</component>

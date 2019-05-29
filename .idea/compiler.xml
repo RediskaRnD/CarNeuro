@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <annotationProcessing>
+      <profile name="Maven default annotation processors profile" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <module name="Car NN" />
+        <module name="Java To TS" />
+      </profile>
+    </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="ts" target="1.8" />
+    </bytecodeTargetLevel>
+  </component>
+  <component name="JavacSettings">
+    <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="Car NN" options="-parameters" />
+      <module name="ts" options="" />
+    </option>
+  </component>
+  <component name="TypeScriptCompiler">
+    <option name="enableServiceForProjectsWithoutConfig" value="false" />
+    <option name="recompileOnChanges" value="true" />
+    <option name="scopeName" value="All Places" />
+    <option name="showAllErrors" value="true" />
+  </component>
+</project>
