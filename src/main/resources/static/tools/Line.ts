@@ -7,6 +7,7 @@ export class Line {
     public p2 : Point;
 
     public constructor(p1 : Point, p2 : Point) {
+
         if(this.p1===undefined) this.p1 = null;
         if(this.p2===undefined) this.p2 = null;
         this.p1 = p1;
