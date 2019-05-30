@@ -11,14 +11,7 @@ HELP.md
 **/liaw/
 **/tools/
 **/*.map
-### STS ###
-.apt_generated
-.classpath
-.factorypath
-.project
-.settings
-.springBeans
-.sts4-cache
+
 
 ### IntelliJ IDEA ###
 .idea
@@ -26,15 +19,5 @@ HELP.md
 *.iml
 *.ipr
 
-### NetBeans ###
-/nbproject/private/
-/nbbuild/
-/dist/
-/nbdist/
-/.nb-gradle/
-/build/
-
-### VS Code ###
-.vscode/
 
 
