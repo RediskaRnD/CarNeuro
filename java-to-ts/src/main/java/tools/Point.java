@@ -6,6 +6,12 @@ public class Point {
     public double x = 0;
     public double y = 0;
 
+    public Point (){}
+    public Point (double x, double y){
+        this.x = x;
+        this.y = y;
+    }
+
     public static double vm(Point p1, Point p2) {
 
         return p1.x * p2.y - p2.x * p1.y;
