@@ -1,4 +1,5 @@
 package tools;
+import def.sprintf.Globals;
 
 public class Point {
 
@@ -48,6 +49,6 @@ public class Point {
     public String toString() {
 //        return "(" + x + ", " + y + ")";
 //        return String.format("(%d, %d)", x, y);
-        return test.format(("liaw"));
+        return Globals.sprintf(("liaw"));
     }
 }
