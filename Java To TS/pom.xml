@@ -7,6 +7,9 @@
     <groupId>rediska</groupId>
     <artifactId>java-to-ts</artifactId>
     <version>1.0-SNAPSHOT</version>
+    <properties>
+       <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
 
     <pluginRepositories>
         <pluginRepository>
