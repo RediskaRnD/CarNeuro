@@ -46,7 +46,8 @@ public class Point {
 
     @Override
     public String toString() {
-        return "(" + x + ", " + y + ")";
+//        return "(" + x + ", " + y + ")";
 //        return String.format("(%d, %d)", x, y);
+        return test.format(("liaw"));
     }
 }

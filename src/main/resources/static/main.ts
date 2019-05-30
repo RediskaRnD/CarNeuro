@@ -1,9 +1,10 @@
 import {Point} from "./tools/Point";
-import {Track} from "./Track";
-import {Car} from "./car";
+import {Track} from "./liaw/Track";
+import {Car} from "./liaw/Car";
 import {ColorPoint} from "./tools/ColorPoint";
-import {Utils} from "./utils";
+import {Utils} from "./liaw/Utils";
 import {Line} from "./tools/Line";
+import {Global} from "./liaw/Global";
 
 
 // var liaw = new Bezier([1,2,3,4]);
@@ -64,7 +65,7 @@ function getTrack(): void {
     Http.onload = () => {
         if (Http.readyState === Http.DONE) {
             if (Http.status === 200) {
-                Utils.track = new Track(Http.response.track);
+                Global.track = new Track(Http.response.track);
                 document.dispatchEvent(eventTrackOnLoad);
             }
         }
@@ -80,8 +81,8 @@ function researchCrossPointsWithCurve(): void {
     crossPointsWithCurve = [];
 
     // проверка пересечений с кривой
-    if (Utils.track) {
-        const tLen = Utils.track.len;
+    if (Global.track) {
+        const tLen = Global.track.len;
         if (tLen < 2) return;
 
         // поиск ведем по левой и правой сторонам трека
@@ -92,8 +93,8 @@ function researchCrossPointsWithCurve(): void {
             for (let i = 0; i < numOfPoints - 1; i += 2) {
                 for (let j = 0; j < tLen - 1; j++) {
                     let p = Line.getCrossPoints(
-                        Utils.track.p[tr][j],
-                        Utils.track.p[tr][j + 1],
+                        Global.track.p[tr][j],
+                        Global.track.p[tr][j + 1],
                         pointsOfLines[i],
                         pointsOfLines[i + 1]
                     );
@@ -159,8 +160,8 @@ function drawLines(): void {
 // отрисовка трека
 function drawTrack(): void {
 
-    if (!Utils.track === undefined) return;
-    let p: Point[][] = Utils.track.p;
+    if (!Global.track === undefined) return;
+    let p: Point[][] = Global.track.p;
     // рисуем обочину
     ctx.lineWidth = Math.round(10 * scale);
     ctx.strokeStyle = "#444444";
@@ -198,7 +199,7 @@ function drawTrack(): void {
     // ищем левую часть вышедшую за экран
     let cp: Point = physicalToLogical({x: cnv.width, y: cnv.height});
     let bPrevIn: boolean | undefined = undefined;
-    for (let i = 0; i < Utils.track.len; i++) {
+    for (let i = 0; i < Global.track.len; i++) {
         let tp = p[1][i];
         if (tp.x < -offset.x || tp.x > cp.x || tp.y < -offset.y || tp.y > cp.y) {
             // мы за границей экрана
@@ -222,7 +223,7 @@ function drawTrack(): void {
     ctx.stroke();
     ctx.beginPath();
     bPrevIn = undefined;
-    for (let i = 0; i < Utils.track.len; i++) {
+    for (let i = 0; i < Global.track.len; i++) {
         let tp = p[2][i];
         if (tp.x < -offset.x || tp.x > cp.x || tp.y < -offset.y || tp.y > cp.y) {
             // мы за границей экрана
@@ -286,19 +287,19 @@ function drawTrack(): void {
 function drawCar(): void {
 
     // рисуем радиус поворота
-    if (car.wheelAngle != 0) {
+    if (car.getWheelAngle() != 0) {
         ctx.beginPath();
         let tp = logicalToPhysical(car.ackerP);
-        if (car.wheelAngle > 0) {
+        if (car.getWheelAngle() > 0) {
             ctx.arc(tp.x, tp.y,
                 car.ackerR * scale,
                 car.ackerA + Math.PI,
-                car.ackerA + Math.PI * (1 + car.wheelAngle)
+                car.ackerA + Math.PI * (1 + car.getWheelAngle())
             );
         } else {
             ctx.arc(tp.x, tp.y,
                 car.ackerR * scale,
-                car.ackerA + Math.PI * (1 + car.wheelAngle),
+                car.ackerA + Math.PI * (1 + car.getWheelAngle()),
                 car.ackerA - Math.PI
             );
         }
@@ -308,9 +309,9 @@ function drawCar(): void {
     }
     // рисуем спрайт тачки
     ctx.save();
-    let carP = logicalToPhysical(car.p);
+    let carP = logicalToPhysical(car.getPosition());
     ctx.translate(carP.x, carP.y);
-    ctx.rotate(car.angle);
+    ctx.rotate(car.getAngle());
     ctx.drawImage(
         car.sprite,
         -car.width / 2 * scale,
@@ -356,7 +357,7 @@ function drawGrid(): void {
 // перерисовываем экран
 function redrawCanvas(): void {
 
-    if (Utils.requestAnimationId) Utils.requestAnimationId = requestAnimationFrame(redrawCanvas);
+    if (Global.requestAnimationId) Global.requestAnimationId = requestAnimationFrame(redrawCanvas);
 
     cnv.width = cnv.clientWidth;
     cnv.height = cnv.clientHeight;
@@ -371,16 +372,16 @@ function redrawCanvas(): void {
     if (dt > 0.1 && car.speed == 0) dt = 0.01;
     car.calcPosition(dt);
     // проверка на выезд за трассу
-    if (car.checkCollisions(Utils.track) == true) {
+    if (car.checkCollisions(Global.track) == true) {
         //car.speed = 0;
         car.recoil(dt);
     }
-    car.updateProgress(Utils.track);
+    car.updateProgress(Global.track);
 
     if (isFollowMode == true) {
         // помещаем тачку в центр
-        offset.x = cnv.width / (2 * scale) - car.p.x;
-        offset.y = cnv.height / (2 * scale) - car.p.y;
+        offset.x = cnv.width / (2 * scale) - car.getPosition().x;
+        offset.y = cnv.height / (2 * scale) - car.getPosition().y;
     } else {
         // переносим центральную точку обзора в центр нового канваса.
         let xOff = (cnv.clientWidth - cnv.width) / 2;
@@ -389,7 +390,7 @@ function redrawCanvas(): void {
         offset.y += yOff / scale;
     }
     fillVars();
-    if (Utils.track) drawTrack();
+    if (Global.track) drawTrack();
     drawLines();
     drawCrossPoints();
     //drawGrid();
@@ -461,14 +462,14 @@ function fillVars(): void {
     //     VirtMP:[${Math.round(virtualMousePosition.x)}, ${Math.round(virtualMousePosition.y)}]`;
 
     str +=
-        `\nCar.p: [${Math.round(car.p.x)}, ${Math.round(car.p.y)}]
+        `\nCar.p: [${Math.round(car.getPosition().x)}, ${Math.round(car.getPosition().y)}]
         
         Speed: [${Math.round(car.speed)}]`;
 
     // str += `\nAckP : [${Math.round(car.ackerP.x)}, ${Math.round(car.ackerP.y)}]
     //     AckR.: [${Math.round(car.ackerR)}]
     //     AckA.: [${Math.round(car.ackerA * 180 / Math.PI)}]
-    //     Wheel: [${Math.round(car.wheelAngle * 180 / Math.PI)}]
+    //     Wheel: [${Math.round(car.getWheelAngle() * 180 / Math.PI)}]
     //     Angle: [${Math.round(car.angle * 180 / Math.PI)}]
     //     Keys.: [${car.keys}]`;
 
@@ -494,7 +495,7 @@ window.onload = () => {
     lastClickedTarget = cnv;
 
     window.addEventListener("resize", () => {
-        if (Utils.requestAnimationId === undefined) redrawCanvas();
+        if (Global.requestAnimationId === undefined) redrawCanvas();
     });
 
     // =====================================
@@ -508,8 +509,8 @@ window.onload = () => {
         researchCrossPointsWithCurve();
         // если загрузились все файлы - начинаем подготовку к старту.
 
-        if (car.isReady && Utils.track) car.restart();
-        if (Utils.requestAnimationId === undefined) redrawCanvas();
+        if (car.isReady && Global.track) car.restart();
+        if (Global.requestAnimationId === undefined) redrawCanvas();
     });
     // =====================================
 
@@ -533,14 +534,14 @@ window.onload = () => {
 
             if (numOfPoints % 2 == 0) {
                 // проверка пересечений с кривой
-                if (Utils.track) {
+                if (Global.track) {
                     for (let tr = 1; tr < 3; tr++) {
-                        const len = Utils.track.len;
+                        const len = Global.track.len;
 
                         for (let i = 0; i < len - 1; i++) {
                             let p = Line.getCrossPoints(
-                                Utils.track.p[tr][i],
-                                Utils.track.p[tr][i + 1],
+                                Global.track.p[tr][i],
+                                Global.track.p[tr][i + 1],
                                 pointsOfLines[numOfPoints - 2],
                                 pointsOfLines[numOfPoints - 1]
                             );
@@ -573,13 +574,13 @@ window.onload = () => {
                     }
                 }
             }
-            if (Utils.requestAnimationId === undefined) redrawCanvas();
+            if (Global.requestAnimationId === undefined) redrawCanvas();
             return;
         }
         if (e.buttons & 4) {    // Middle button
             // переключаем режим следования камеры за машиной
             isFollowMode = !isFollowMode;
-            if (Utils.requestAnimationId === undefined) redrawCanvas();
+            if (Global.requestAnimationId === undefined) redrawCanvas();
         }
     });
     // =====================================
@@ -604,7 +605,7 @@ window.onload = () => {
             offset.y += (e.clientY - mouseDownPoint.y) / scale;
             mouseDownPoint.x = e.clientX;
             mouseDownPoint.y = e.clientY;
-            if (Utils.requestAnimationId === undefined) redrawCanvas();
+            if (Global.requestAnimationId === undefined) redrawCanvas();
         }
         // Middle button
         if (e.buttons & 4) {
@@ -617,7 +618,7 @@ window.onload = () => {
         // e.preventDefault();
         // e.stopPropagation();
         rescaleCanvas(e.deltaY > 0 ? 0.9 : 10 / 9, {x: e.clientX, y: e.clientY});
-        if (Utils.requestAnimationId === undefined) redrawCanvas();
+        if (Global.requestAnimationId === undefined) redrawCanvas();
     }, {passive: true});
     // =====================================
 
@@ -676,13 +677,13 @@ window.onload = () => {
                 switch (redrawRequest) {
                     case 1:
                         // просто перерисовываем канвас
-                        if (Utils.requestAnimationId === undefined) redrawCanvas();
+                        if (Global.requestAnimationId === undefined) redrawCanvas();
                         break;
                     case 2:
                         // запускаем анимацию
-                        if (Utils.requestAnimationId === undefined) {
+                        if (Global.requestAnimationId === undefined) {
                             Utils.debug("anim+");
-                            Utils.requestAnimationId = requestAnimationFrame(redrawCanvas);
+                            Global.requestAnimationId = requestAnimationFrame(redrawCanvas);
                         }
                         break;
                 }
@@ -729,8 +730,8 @@ window.onload = () => {
     car.sprite.onload = () => {
         Utils.debug("sprite");
         car.isReady = true;
-        if (Utils.track) car.restart();
-        if (Utils.requestAnimationId === undefined) redrawCanvas();
+        if (Global.track) car.restart();
+        if (Global.requestAnimationId === undefined) redrawCanvas();
     };
 };//version
 // =====================================================================================================================

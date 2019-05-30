@@ -6,6 +6,10 @@ HELP.md
 #!.mvn/wrapper/maven-wrapper.jar
 **/*.js
 !Gruntfile.js
+!require.js
+!sprintf.js
+**/liaw/
+**/tools/
 **/*.map
 ### STS ###
 .apt_generated

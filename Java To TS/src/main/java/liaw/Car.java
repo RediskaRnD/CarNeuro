@@ -1,9 +1,10 @@
-import org.w3c.dom.html.HTMLImageElement;
+package liaw;
+
+import def.dom.Image;
 import tools.Line;
 import tools.Point;
 
 import static def.dom.Globals.cancelAnimationFrame;
-import static jdk.nashorn.internal.objects.Global.Infinity;
 
 public class Car {
 
@@ -31,7 +32,7 @@ public class Car {
 
     boolean isReady = false;
 
-    HTMLImageElement sprite;        // картинка тачки
+    Image sprite;                  // картинка тачки
 
     double speed = 0;               // текущая скорость машины
     int keys = 0;                   // зажатые кнопки управления
@@ -41,7 +42,7 @@ public class Car {
     double fuel = 0;                // оставшееся количество топлива
     // =====================================
 
-    public Car(int width, int height, double acceleration, int maxSpeed) {
+    public Car(int width, int height, double acceleration, double maxSpeed) {
 
         this.width = width;
         this.height = height;
@@ -62,12 +63,13 @@ public class Car {
         ackerP = new Point();
         ackerP.x = 0;
         ackerP.y = 0;
-        ackerA = Infinity;
-        ackerR = Infinity;
+        ackerA = Double.POSITIVE_INFINITY;
+        ackerR = Double.POSITIVE_INFINITY;
 
         _angle = 0;
         _wheelAngle = 0;
     }
+
     // =====================================
     // CarPosition
     public Point getPosition() {
@@ -85,6 +87,7 @@ public class Car {
             cornerP[i] = Point.sum(cornerP[i], dp);
         }
     }
+
     // =====================================
     // угол поворота колес относительно оси автомобиля
     public double getWheelAngle() {
@@ -106,6 +109,7 @@ public class Car {
             ackerP = Point.getPointByAngle(_position, ackerR, ackerA);
         }
     }
+
     // =====================================
     // угол машины относительно оси Х
     public double getAngle() {
@@ -183,9 +187,9 @@ public class Car {
             }
         }
         // машина не двигается и колёса стоят ровно, останавливаем анимацию
-        if ((keys == 0) && (v == 0) && (_wheelAngle == 0) && Utils.requestAnimationId != null) {
-            cancelAnimationFrame(Utils.requestAnimationId);
-            Utils.requestAnimationId = null;
+        if ((keys == 0) && (v == 0) && (_wheelAngle == 0) && Global.requestAnimationId != null) {
+            cancelAnimationFrame(Global.requestAnimationId);
+            Global.requestAnimationId = null;
             Utils.debug("anim-");
         }
 
@@ -202,6 +206,7 @@ public class Car {
             setPosition(Point.getPointByAngle(_position, speed * dt, _angle));
         }
     }
+
     // =====================================
     // пересчитываем скорость машины
     void calcSpeed(double axl, double dt, double vMin, double vMax) {
@@ -231,31 +236,33 @@ public class Car {
 
     // =====================================
     // проверяем между какими зебрами находимся
-    void updateProgress(Track track) {  // TODO упростить дублирующийся код
+    void updateProgress(Track track) {  // TODO проверить функцию. Подозрительная.
 
         int st = stage;
         // проверка следующей зебры
         if (stage < track.len - 1) {
             st = stage + 1;
             // проверяем диагонали на пересечение зебры
-            if (Line.isCrossing(track.p[1][st], track.p[2][st], cornerP[0], cornerP[2]) == true
-                    ||
-                    Line.isCrossing(track.p[1][st], track.p[2][st], cornerP[1], cornerP[3]) == true) {
-                stage = st;
-                return;
-            }
+            if (checkIntersectionWithTrack(track, st) == true) return;
         }
         // проверка на случай если мы едем задом наперёд
         if (stage > 0) {
             st = stage - 1;
             // проверяем диагонали на пересечение зебры
-            if (Line.isCrossing(track.p[1][st], track.p[2][st], cornerP[0], cornerP[2]) == true
-                    ||
-                    Line.isCrossing(track.p[1][st], track.p[2][st], cornerP[1], cornerP[3]) == true) {
-                stage = st;
-                return;
-            }
+            if (checkIntersectionWithTrack(track, st) == true) return;
         }
+    }
+    // =====================================
+
+    private boolean checkIntersectionWithTrack(Track track, int stage) {
+
+        boolean a = Line.isCrossing(track.p[1][stage], track.p[2][stage], cornerP[0], cornerP[2]);
+        boolean b = Line.isCrossing(track.p[1][stage], track.p[2][stage], cornerP[1], cornerP[3]);
+        if (a || b) {
+            this.stage = stage;
+            return true;
+        }
+        return false;
     }
 
     // =====================================
@@ -275,7 +282,7 @@ public class Car {
         p.x = 0;
         p.y = 0;
         setPosition(p);
-        setAngle(Point.angleByPoints(Utils.track.p[0][0], Utils.track.p[0][1]));
+        setAngle(Point.angleByPoints(Global.track.p[0][0], Global.track.p[0][1]));
         setWheelAngle(0);
         speed = 0;
         time = 0;
