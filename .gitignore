@@ -8,8 +8,8 @@ HELP.md
 !require.js
 !sprintf.js
 **/target/
-**/liaw/
-**/tools/
+**/liaw/*.ts
+**/tools/*.ts
 **/*.map
 
 
