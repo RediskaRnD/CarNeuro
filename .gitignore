@@ -8,8 +8,8 @@ HELP.md
 !Gruntfile.js
 !require.js
 !sprintf.js
-**/liaw/
-**/tools/
+**/liaw/*.ts
+**/tools/*.ts
 **/*.map
 ### STS ###
 .apt_generated

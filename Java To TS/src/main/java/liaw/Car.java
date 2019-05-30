@@ -1,5 +1,5 @@
 package liaw;
-
+// тест языковой. Cp1252 漢字, упр. 汉字
 import def.dom.Image;
 import tools.Line;
 import tools.Point;
