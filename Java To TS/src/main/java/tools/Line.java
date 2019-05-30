@@ -1,6 +1,5 @@
 package tools;
 
-// тест
 public class Line {
 
     public Point p1;

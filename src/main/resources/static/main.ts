@@ -1,5 +1,5 @@
 import {Point} from "./tools/Point";
-import {Track} from "./tools/Track";
+import {Track} from "./Track";
 import {Car} from "./car";
 import {ColorPoint} from "./tools/ColorPoint";
 import {Utils} from "./utils";
