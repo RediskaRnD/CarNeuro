@@ -1,17 +1,17 @@
 module.exports = function(grunt) {
     grunt.initConfig({
         clean: {
-            js: ['src/main/resources/**/*.js',
-                'src/main/resources/**/*.map',
-                '!src/main/resources/**/sprintf.js',
-                '!src/main/resources/**/require.js']
+            js: ['web-server/src/main/resources/**/*.js',
+                'web-server/src/main/resources/**/*.map',
+                '!web-server/src/main/resources/**/sprintf.js',
+                '!web-server/src/main/resources/**/require.js']
         },
         ts: {
             default : {
                 options: {
-                    rootDir: 'src/main/resources/static'
+                    rootDir: 'web-server/src/main/resources/static'
                 },
-                tsconfig: 'src/main/resources/tsconfig.json'
+                tsconfig: 'web-server/src/main/resources/tsconfig.json'
             }
         }
     });

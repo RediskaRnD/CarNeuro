@@ -1,8 +1,7 @@
 package rediska;
 
 import org.springframework.stereotype.Service;
-
-import java.awt.*;
+import tools.Point;
 
 @Service
 public class TrackGenerator {
@@ -129,10 +128,10 @@ public class TrackGenerator {
             w = w < widthMax ? w : widthMax;
             w = w > widthMin ? w : widthMin;
 
-            track[1][i] = Tools.lineToAngle(p, w / 2, (float) (newAngle + previousAngle - Math.PI) / 2);
-            track[2][i] = Tools.lineToAngle(p, w / 2, (float) (newAngle + previousAngle + Math.PI) / 2);
+            track[1][i] = Point.getPointByAngle(p, w / 2, (float) (newAngle + previousAngle - Math.PI) / 2);
+            track[2][i] = Point.getPointByAngle(p, w / 2, (float) (newAngle + previousAngle + Math.PI) / 2);
 
-            p = Tools.lineToAngle(p, len, newAngle);
+            p = Point.getPointByAngle(p, len, newAngle);
             previousAngle = newAngle;
         }
     }
