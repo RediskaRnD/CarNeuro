@@ -40,33 +40,6 @@
     <build>
         <plugins>
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-clean-plugin</artifactId>
-                <configuration>
-                    <filesets>
-                        <fileset>
-                            <directory>../src/main/resources</directory>
-                            <includes>
-                                <include>**/*.js</include>
-                                <include>**/*.map</include>
-                            </includes>
-                            <excludes>
-                                <exclude>**/require.js</exclude>
-                            </excludes>
-                            <followSymlinks>false</followSymlinks>
-                        </fileset>
-                    </filesets>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-install-plugin</artifactId>
-                <configuration>
-                    <localRepositoryPath>liaw</localRepositoryPath>
-
-                </configuration>
-            </plugin>
-            <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <!--                <version>3.1</version>-->
                 <configuration>
@@ -88,6 +61,7 @@
                     <module>amd</module>
                     <moduleResolution>classic</moduleResolution>
                     <tsOnly>true</tsOnly>
+			<encoding>UTF-8</encoding>
                 </configuration>
                 <executions>
                     <execution>
