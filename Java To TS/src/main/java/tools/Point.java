@@ -1,15 +1,27 @@
 package tools;
-import def.sprintf.Globals;
 
 public class Point {
 
     public double x = 0;
     public double y = 0;
 
+    // =====================================
+
+    public Point() {
+    }
+    // =====================================
+
+    public Point(double x, double y) {
+        this.x = x;
+        this.y = y;
+    }
+    // =====================================
+
     public static double vm(Point p1, Point p2) {
 
         return p1.x * p2.y - p2.x * p1.y;
     }
+    // =====================================
 
     public static Point sub(Point p1, Point p2) {
 
@@ -18,6 +30,7 @@ public class Point {
         point.y = p1.y - p2.y;
         return point;
     }
+    // =====================================
 
     public static Point sum(Point p1, Point p2) {
 
@@ -26,6 +39,7 @@ public class Point {
         point.y = p1.y + p2.y;
         return point;
     }
+    // =====================================
 
     public static double angleByPoints(Point p1, Point p2) {
 
@@ -45,10 +59,11 @@ public class Point {
         return p2;
     }
 
+    // =====================================
     @Override
     public String toString() {
-//        return "(" + x + ", " + y + ")";
+        return "(" + x + ", " + y + ")";
 //        return String.format("(%d, %d)", x, y);
-        return Globals.sprintf(("liaw"));
+//        return Globals.sprintf(("liaw"));
     }
 }

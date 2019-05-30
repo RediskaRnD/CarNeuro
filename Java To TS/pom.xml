@@ -61,7 +61,7 @@
                     <module>amd</module>
                     <moduleResolution>classic</moduleResolution>
                     <tsOnly>true</tsOnly>
-			<encoding>UTF-8</encoding>
+			        <encoding>UTF-8</encoding>
                 </configuration>
                 <executions>
                     <execution>

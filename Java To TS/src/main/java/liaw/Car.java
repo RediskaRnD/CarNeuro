@@ -1,5 +1,6 @@
 package liaw;
 // тест языковой. Cp1252 漢字, упр. 汉字
+
 import def.dom.Image;
 import tools.Line;
 import tools.Point;
@@ -9,37 +10,39 @@ import static def.dom.Globals.cancelAnimationFrame;
 public class Car {
 
     // readonly
-    private double maxSpeed;        // максимальная скорость
-    public int width;               // длина машины
-    public int height;              // ширина машины
-    public double axl;              // ускорение тачки вперёд
+    private double maxSpeed;                // максимальная скорость
+    public int width;                       // длина машины
+    public int height;                      // ширина машины
+    public double axl;                      // ускорение тачки вперёд
 
-    private double r;               // TODO что это такое?
-    private double a;               // TODO что это такое?
+    private double r;                       // TODO что это такое?
+    private double a;                       // TODO что это такое?
 
-    final double maxWheelAngle = Math.PI / 180 * 42;
+    final double maxWheelAngle = Math.PI / 180 * 42;    // максимальный угол поворота колеса
+
     // end readonly
-    Point[] cornerP = new Point[4]; // координаты углов тачки
-
-    Point ackerP;                   // точка аккермана
-    double ackerA;                  // угол между задней осью и центром тачки относительно ackerP
-    double ackerR;                  // радиус аккермана для центра тачки
+    Point[] cornerP = {new Point(), new Point(), new Point(), new Point()}; // координаты углов машины
 
 
-    private Point _position;
-    private double _angle;          // угол машины
-    private double _wheelAngle;     // угол колеса машины
+    Point ackerP = new Point();             // точка аккермана
+    double ackerA = 1.0 / 0.0;              // угол между задней осью и центром тачки относительно ackerP
+    double ackerR = 1.0 / 0.0;              // радиус аккермана для центра тачки
 
-    boolean isReady = false;
 
-    Image sprite;                  // картинка тачки
+    private Point _position = new Point();  // текущая позиция машины
+    private double _carAngle = 0;           // угол машины
+    private double _wheelAngle = 0;         // угол колеса машины
 
-    double speed = 0;               // текущая скорость машины
-    int keys = 0;                   // зажатые кнопки управления
+    boolean isReady = false;                // TODO нужен ли он?
 
-    double time = 0;                // время заезда
-    int stage = 0;                  // сегмент трэка на котором находится тачка
-    double fuel = 0;                // оставшееся количество топлива
+    Image sprite;                           // TODO картинка тачки - сделать локальным ресурсом
+
+    double speed = 0;                       // текущая скорость машины
+    int keys = 0;                           // зажатые кнопки управления
+
+    double time = 0;                        // время заезда
+    int stage = 0;                          // сегмент трэка на котором находится тачка
+    double fuel = 0;                        // оставшееся количество топлива
     // =====================================
 
     public Car(int width, int height, double acceleration, double maxSpeed) {
@@ -51,23 +54,8 @@ public class Car {
 
         r = Math.sqrt(height * height + width * width) / 2;
 
-        _position = new Point();
-        _position.x = 0;
-        _position.y = 0;
-
-        Point midPoint = new Point();
-        midPoint.x = width / 2;
-        midPoint.y = height / 2;
+        Point midPoint = new Point(width / 2, height / 2);
         a = Point.angleByPoints(_position, midPoint);
-
-        ackerP = new Point();
-        ackerP.x = 0;
-        ackerP.y = 0;
-        ackerA = Double.POSITIVE_INFINITY;
-        ackerR = Double.POSITIVE_INFINITY;
-
-        _angle = 0;
-        _wheelAngle = 0;
     }
 
     // =====================================
@@ -105,7 +93,7 @@ public class Car {
             // ищем точку аккермана
             double ackerL = width / Math.tan(_wheelAngle);
             ackerR = Math.sqrt(width * width / 4 + ackerL * ackerL);
-            ackerA = _angle + (Math.asin(width / (2 * this.ackerR)) + Math.PI / 2) * (_wheelAngle > 0 ? 1 : -1);
+            ackerA = _carAngle + (Math.asin(width / (2 * this.ackerR)) + Math.PI / 2) * (_wheelAngle > 0 ? 1 : -1);
             ackerP = Point.getPointByAngle(_position, ackerR, ackerA);
         }
     }
@@ -114,16 +102,16 @@ public class Car {
     // угол машины относительно оси Х
     public double getAngle() {
 
-        return this._angle;
+        return this._carAngle;
     }
 
     public void setAngle(double value) {
-        _angle = value;
+        _carAngle = value;
         // Находим крайние точки тачки.
-        cornerP[0] = (Point.getPointByAngle(_position, r, _angle + a));
-        cornerP[1] = (Point.getPointByAngle(_position, r, _angle - a));
-        cornerP[2] = (Point.getPointByAngle(_position, r, _angle + a + Math.PI));
-        cornerP[3] = (Point.getPointByAngle(_position, r, _angle - a + Math.PI));
+        cornerP[0] = (Point.getPointByAngle(_position, r, _carAngle + a));
+        cornerP[1] = (Point.getPointByAngle(_position, r, _carAngle - a));
+        cornerP[2] = (Point.getPointByAngle(_position, r, _carAngle + a + Math.PI));
+        cornerP[3] = (Point.getPointByAngle(_position, r, _carAngle - a + Math.PI));
     }
     // =====================================
 
@@ -199,11 +187,11 @@ public class Car {
             // на какой угол повернулась машина относительно точки аккермана.
             double dAngle = s / ackerR * (_wheelAngle > 0 ? 1 : -1);
             // поворачиваем корпус тачки
-            setAngle(_angle + dAngle);
+            setAngle(_carAngle + dAngle);
             // находим новую позицию тачки
             setPosition(Point.getPointByAngle(ackerP, ackerR, (ackerA + dAngle + Math.PI)));
         } else {
-            setPosition(Point.getPointByAngle(_position, speed * dt, _angle));
+            setPosition(Point.getPointByAngle(_position, speed * dt, _carAngle));
         }
     }
 
@@ -269,7 +257,7 @@ public class Car {
     // отскок машины от препятствия
     void recoil(double dt) {
 
-        setPosition(Point.getPointByAngle(_position, speed * dt * 2, _angle - Math.PI));
+        setPosition(Point.getPointByAngle(_position, speed * dt * 2, _carAngle - Math.PI));
         speed = -speed / 3;
     }
 

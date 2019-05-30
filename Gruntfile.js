@@ -2,9 +2,12 @@ module.exports = function(grunt) {
     grunt.initConfig({
         clean: {
             js: ['src/main/resources/**/*.js',
+                'src/main/resources/tools/*.ts',
+                'src/main/resources/liaw/*.ts',
                 'src/main/resources/**/*.map',
                 '!src/main/resources/**/sprintf.js',
-                '!src/main/resources/**/require.js']
+                '!src/main/resources/**/require.js'],
+            debug: {}
         },
         ts: {
             default : {
