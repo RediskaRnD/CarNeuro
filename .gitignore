@@ -1,6 +1,5 @@
 HELP.md
-/Java To TS/.jsweet/
-/Java To TS/target/
+**/.jsweet/
 /node_modules/
 /.tscache/
 #!.mvn/wrapper/maven-wrapper.jar
@@ -8,6 +7,7 @@ HELP.md
 !Gruntfile.js
 !require.js
 !sprintf.js
+**/target/
 **/liaw/
 **/tools/
 **/*.map
