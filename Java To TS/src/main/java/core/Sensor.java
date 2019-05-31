@@ -21,35 +21,19 @@ public class Sensor {
 
     // =====================================
     // Точка пересечения луча с треком
-    public Point getIntersection() {        // TODO исправить, срочно!!!
-
+    public Point getIntersection() {
         intersection = null;
-//
-//        Point cp = Point.getPointByAngle(car.getPosition(), maxDistance, angle + car.getAngle());
-//        int limit = Math.max(Math.abs(track.len - car.stage), car.stage);
-//        for (int step = 0; step < limit - 1; step++) {
-//            for (int inversion = 0; inversion < 2; inversion++) {
-//                int first = car.stage + (inversion == 0 ? step : -step);
-//                if (first < 0 || first > track.len - 2) break;
-//                for (int i = 1; i < 3; i++) {
-//                    int second = first + (inversion == 0 ? 1 : -1);
-//                    if (second < 0 || second > track.len - 1) break;
-//                    Global.index[0] = first;
-//                    Global.index[1] = second;
-//                    Global.index[2] = step;
-//                    Global.index[3] = inversion;
-//                    Global.index[4] = i;
-//                    intersection = Line.getCrossPoints(car.getPosition(), cp, track.p[i][first], track.p[i][second]);
-//                    if (intersection != null) return intersection;
-//                }
-//            }
-//        }
-//        int lim = Math.max(Math.abs(track.len - 1 - car.stage), car.stage);
-//        for (int i = 0, j = 0; i < 10; j = ++j % 2, i = (j == 1 ? -i : Math.abs(i) + 1)) {
-//            int first = car.stage + i;
-//            if (first < 0 || first > track.len - 2) break;
-//        }
-
+        Point cp = Point.getPointByAngle(car.getPosition(), maxDistance, angle + car.getAngle());
+        int lim = Math.max(Math.abs(track.len - 1 - car.stage), car.stage);
+        for (int i = 0, j = 1; i < lim; j = -j, i = (j == 1 ? Math.abs(i) + 1 : -i)) {
+            int first = car.stage + i;
+            int second = car.stage + i + j;
+            if (first < 0 || second < 0 || first > track.len - 1 || second > track.len - 1) continue;
+            for (int k = 1; k < 3; k++) {
+                intersection = Line.getCrossPoints(car.getPosition(), cp, track.p[k][first], track.p[k][second]);
+                if (intersection != null) return intersection;
+            }
+        }
         return null;
     }
 
