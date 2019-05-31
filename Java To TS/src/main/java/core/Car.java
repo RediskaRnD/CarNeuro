@@ -57,21 +57,22 @@ public class Car {
         Point midPoint = new Point(width / 2, height / 2);
         a = Point.angleByPoints(_position, midPoint);
 
-        initSensors(5, Math.PI * 2 / 3);
+        initSensors(5, Math.PI * 2 / 3, 500);
     }
+
     // =====================================
     // quantity - количество датчиков
     // angle - угол который они охватывают
-    private void initSensors(int quantity, double angle) {
+    private void initSensors(int quantity, double angle, double distance) {
         if (quantity == 1) {
-            sensors = new Sensor[]{new Sensor(this, track, 0)};
+            sensors = new Sensor[]{new Sensor(this, track, 0, distance)};
         } else {
             // равномерно распределяем лучи
             double segment = angle / (quantity - 1);
             angle /= 2;
             sensors = new Sensor[quantity];
             for (int i = 0; i < quantity; i++) {
-                sensors[i] = new Sensor(this, track, angle);
+                sensors[i] = new Sensor(this, track, angle, distance);
                 angle -= segment;
             }
         }
@@ -129,7 +130,7 @@ public class Car {
     }
     // =====================================
 
-    void calcPosition(double dt) {
+    void updatePosition(double dt) {
         double v = speed;
 
         if (fuel > 0) {
@@ -207,8 +208,14 @@ public class Car {
         } else {
             setPosition(Point.getPointByAngle(_position, speed * dt, _carAngle));
         }
-        // обновляем показания сенсоров
-        for(Sensor sens: sensors){
+
+        updateSensors();
+    }
+
+    // =====================================
+    // обновляем показания сенсоров
+    private void updateSensors() {
+        for (Sensor sens : sensors) {
             sens.getIntersection();
             sens.getDistance();
         }
@@ -241,7 +248,7 @@ public class Car {
 
     // =====================================
     // проверяем между какими зебрами находимся
-    void updateProgress(Track track) {  // TODO проверить функцию. Подозрительная. почему тут не for для проверки ближайших?
+    void updateProgress() {  // TODO проверить функцию. Подозрительная. почему тут не for для проверки ближайших?
         int st = stage;
         // проверка следующей зебры
         if (stage < track.len - 1) {

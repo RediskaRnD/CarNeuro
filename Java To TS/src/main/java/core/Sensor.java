@@ -4,23 +4,33 @@ import tools.Point;
 import tools.Line;
 
 public class Sensor {
-    public final static double maxDistance = 5000;   // расстояние на которое способен видить сенсор
-
-    private Car car;                                // Машина на которой установлен сенсор
-    private Track track;                            // Трек по которой едет машина
-    public Point intersection;                      // Точка пересечения луча с треком
-    public double angle;                            // угол под которым установлен сенсор
-    private double distance;                        // расстояние до препятствия (вычисляется)
+    public double maxDistance;              // расстояние на которое способен видить сенсор
+    private Car car;                        // Машина на которой установлен сенсор
+    private Track track;                    // Трек по которой едет машина
+    public Point intersection;              // Точка пересечения луча с треком
+    public double angle;                    // угол под которым установлен сенсор
+    private double distance;                // расстояние до препятствия (вычисляется)
 
     // =====================================
-    Sensor(Car car, Track track, double angle) {
+    Sensor(Car car, Track track, double angle, double distance) {
         this.car = car;
         this.track = track;
         this.angle = angle;
+        this.maxDistance = distance;
     }
 
     // =====================================
     // Точка пересечения луча с треком
+    // пример работы алгоритма: stage = 2, track.len = 10;
+    // 2, 3 (first, second)
+    // 2, 1
+    // 3, 4
+    // 1, 0
+    // 4, 5
+    // 5, 6
+    // 6, 7
+    // 7, 8
+    // 8, 9
     public Point getIntersection() {
         intersection = null;
         Point cp = Point.getPointByAngle(car.getPosition(), maxDistance, angle + car.getAngle());

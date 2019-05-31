@@ -379,12 +379,12 @@ function redrawCanvas(): void {
 
     // если машину не трогали то только отрисовываем её старое положение, вернёмся на следующем тике, с нормальным dt
     if (dt > 0.1 && Global.car.speed == 0) dt = 0.01;
-    Global.car.calcPosition(dt);
+    Global.car.updatePosition(dt);
     // проверка на выезд за трассу
     if (Global.car.checkCollisions(Global.track) == true) {
         Global.car.recoil(dt);
     }
-    Global.car.updateProgress(Global.track);
+    Global.car.updateProgress();
 
     if (isFollowMode == true) {
         // помещаем тачку в центр
