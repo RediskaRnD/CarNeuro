@@ -3,7 +3,7 @@ module.exports = function(grunt) {
         clean: {
             js: ['src/main/resources/**/*.js',
                 'src/main/resources/tools/*.ts',
-                'src/main/resources/liaw/*.ts',
+                'src/main/resources/core/*.ts',
                 'src/main/resources/**/*.map',
                 '!src/main/resources/**/sprintf.js',
                 '!src/main/resources/**/require.js'],

@@ -18,45 +18,38 @@ public class Point {
     // =====================================
 
     public static double vm(Point p1, Point p2) {
-
         return p1.x * p2.y - p2.x * p1.y;
     }
     // =====================================
 
     public static Point sub(Point p1, Point p2) {
-
-        Point point = new Point();
-        point.x = p1.x - p2.x;
-        point.y = p1.y - p2.y;
-        return point;
+        return new Point(p1.x - p2.x, p1.y - p2.y);
     }
     // =====================================
 
     public static Point sum(Point p1, Point p2) {
+        return new Point(p1.x + p2.x, p1.y + p2.y);
+    }
+    // =====================================
 
-        Point point = new Point();
-        point.x = p1.x + p2.x;
-        point.y = p1.y + p2.y;
-        return point;
+    public Point round() {
+        this.x = (int) this.x;
+        this.y = (int) this.y;
+        return this;
     }
     // =====================================
 
     public static double angleByPoints(Point p1, Point p2) {
-
         final double dx = p2.x - p1.x;
         final double dy = p2.y - p1.y;
-        final double a = (Math.atan2(dy, dx));
+        final double a = Math.atan2(dy, dx);
         return a > 0 ? a : 2 * Math.PI + a;
     }
 
     // =====================================
     // угол растёт по часовой стрелке
     public static Point getPointByAngle(Point p, double length, double angle) {
-
-        Point p2 = new Point();
-        p2.x = p.x + length * Math.cos(angle);
-        p2.y = p.y + length * Math.sin(angle);
-        return p2;
+        return new Point(p.x + length * Math.cos(angle), p.y + length * Math.sin(angle));
     }
 
     // =====================================
@@ -64,6 +57,6 @@ public class Point {
     public String toString() {
         return "(" + x + ", " + y + ")";
 //        return String.format("(%d, %d)", x, y);
-//        return Globals.sprintf(("liaw"));
+//        return Globals.sprintf(("core"));
     }
 }

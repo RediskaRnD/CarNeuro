@@ -8,7 +8,7 @@ HELP.md
 !Gruntfile.js
 !require.js
 !sprintf.js
-**/liaw/*.ts
+**/core/*.ts
 **/tools/*.ts
 **/*.map
 /target/

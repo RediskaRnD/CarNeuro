@@ -1,9 +1,8 @@
-package liaw;
+package core;
 
 import tools.Point;
 
 public class Track {
-
     public Point[][] p;
     public int len = 0;
     public double xMin = 0;
@@ -12,7 +11,6 @@ public class Track {
     public double yMax = 0;
 
     public Track(Point[][] track) {
-
         p = track;
         this.len = track[0].length;
 

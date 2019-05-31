@@ -1,4 +1,4 @@
-package liaw;//import static def.dom.Document.*;
+package core;//import static def.dom.Document.*;
 
 import def.dom.HTMLElement;
 
@@ -12,7 +12,6 @@ final public class Utils {
     private static HTMLElement log = document.getElementById("log");
 
     static void debug(String str) {
-
         // проверка положения скрола
         if (Math.abs(log.scrollTop + log.clientHeight - log.scrollHeight) < 1) {
             log.innerText += str + '\n';
@@ -20,9 +19,9 @@ final public class Utils {
         } else {
             log.innerText += str + '\n';
         }
-        // const d = log.innerText.length - 200;
+        // const d = log.innerText.distance - 200;
         // if (d > 0) {
-        //     log.innerText = log.innerText.substring(d + str.length, 201 + str.length) + str + '\n';
+        //     log.innerText = log.innerText.substring(d + str.distance, 201 + str.distance) + str + '\n';
         // } else {
         //     log.innerText += str + '\n';
         // }

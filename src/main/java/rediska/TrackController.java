@@ -7,8 +7,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import tools.Point;
 
-import java.awt.*;
 import java.util.HashMap;
 
 
@@ -38,10 +38,10 @@ public class TrackController {
     }
 
     @GetMapping("/track")
-    public String track(@RequestParam(name = "a", required = false, defaultValue = "110") float angle,
-                        @RequestParam(name = "l", required = false, defaultValue = "50") Integer length,
-                        @RequestParam(name = "wMin", required = false, defaultValue = "60") float widthMin,
-                        @RequestParam(name = "wMax", required = false, defaultValue = "200") float widthMax
+    public String track(@RequestParam(name = "a", required = false, defaultValue = "110") double angle,
+                        @RequestParam(name = "l", required = false, defaultValue = "50") int length,
+                        @RequestParam(name = "wMin", required = false, defaultValue = "60") double widthMin,
+                        @RequestParam(name = "wMax", required = false, defaultValue = "200") double widthMax
     ) {
         trackGenerator.setAngle(angle);
         trackGenerator.setLength(length);
