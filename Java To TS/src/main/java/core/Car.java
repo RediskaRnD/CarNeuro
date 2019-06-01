@@ -1,31 +1,27 @@
 package core;
 
-import def.dom.Image;
 import tools.Line;
 import tools.Point;
 
-import static def.dom.Globals.cancelAnimationFrame;
-
 public class Car {
+    private final double maxWheelAngle = Math.PI / 180 * 42;    // максимальный угол поворота колеса
     // readonly
     private Track track;
     private double maxSpeed;                    // максимальная скорость
     public int width;                           // длина машины
     public int height;                          // ширина машины
-    public double axl;                          // ускорение тачки вперёд
+    private double axl;                          // ускорение тачки вперёд
 
-    private double r;                           // TODO что это такое?
-    private double a;                           // TODO что это такое?
-
-    final double maxWheelAngle = Math.PI / 180 * 42;    // максимальный угол поворота колеса
+    private double r;                           // расстояние от центра машины до её угловой точки
+    private double a;                           // угол Point.angleByPoints(позиция машины, средняя точка машины);
+    // видимо они не совпадают, поэтому TODO стоит перепроверить это
 
     // end readonly
-    Point[] cornerP = {new Point(), new Point(), new Point(), new Point()}; // координаты углов машины
+    private Point[] cornerP = {new Point(), new Point(), new Point(), new Point()}; // координаты углов машины
 
-
-    Point ackerP = new Point();                 // точка аккермана
-    double ackerA = 1.0 / 0.0;                  // угол между задней осью и центром тачки относительно ackerP
-    double ackerR = 1.0 / 0.0;                  // радиус аккермана для центра тачки
+    private Point ackerP = new Point();         // точка аккермана
+    private double ackerA = 1.0 / 0.0;          // угол между задней осью и центром тачки относительно ackerP
+    private double ackerR = 1.0 / 0.0;          // радиус аккермана для центра тачки
 
     private Point _position = new Point();      // текущая позиция машины
     private double _carAngle = 0;               // угол машины
@@ -33,16 +29,16 @@ public class Car {
 
     boolean isReady = false;                    // TODO нужен ли он?
 
-    Image sprite;                               // картинка машины
+    public Object sprite;                       // картинка машины
 
     double speed = 0;                           // текущая скорость машины
-    int keys = 0;                               // зажатые кнопки управления
+    public int keys = 0;                        // зажатые кнопки управления
 
     double time = 0;                            // время заезда
     int stage = 0;                              // сегмент трэка на котором находится тачка
     double fuel = 0;                            // оставшееся количество топлива
 
-    Sensor[] sensors;                           // сенсоры расстояния
+    private Sensor[] sensors;                   // сенсоры расстояния
     // =====================================
 
     public Car(Track track, int width, int height, double acceleration, double maxSpeed) {
@@ -79,12 +75,12 @@ public class Car {
     }
 
     // =====================================
-    // CarPosition
+    // позиция машины
     public Point getPosition() {
         return _position;
     }
 
-    public void setPosition(Point p) {
+    private void setPosition(Point p) {
         // находим разницу между положением прошлым и настоящим
         Point dp = Point.sub(p, _position);
         _position = p;
@@ -100,7 +96,7 @@ public class Car {
         return _wheelAngle;
     }
 
-    public void setWheelAngle(double value) {
+    private void setWheelAngle(double value) {
         _wheelAngle = Math.min(Math.max(value, -maxWheelAngle), maxWheelAngle);
         // если угол поворота колеса меньше 1 градуса то округляем его до 0
         if (Math.abs(this._wheelAngle) <= Math.PI / 180) {
@@ -128,9 +124,63 @@ public class Car {
         cornerP[2] = (Point.getPointByAngle(_position, r, _carAngle + a + Math.PI));
         cornerP[3] = (Point.getPointByAngle(_position, r, _carAngle - a + Math.PI));
     }
-    // =====================================
 
-    void updatePosition(double dt) {
+    // =====================================
+    // обновление всех параметров машины
+    public void update(double dt) {
+        updateSpeed(dt);
+        updateWheelAngle(dt);
+        updatePosition(dt);
+        updateSensors();
+        // проверка на выезд за трассу
+        if (checkCollisions() == true) {
+            recoil(dt);
+        }
+        updateStageProgress();
+    }
+
+    // =====================================
+    // обновление позиции машины
+    private void updatePosition(double dt) {
+        double s = dt * this.speed;    // пройденный путь за dt
+        if (_wheelAngle != 0) {
+            // находим угол на который сместились за dt
+            // на какой угол повернулась машина относительно точки аккермана.
+            double dAngle = s / ackerR * (_wheelAngle > 0 ? 1 : -1);
+            // поворачиваем корпус тачки
+            setAngle(_carAngle + dAngle);
+            // находим новую позицию тачки
+            setPosition(Point.getPointByAngle(ackerP, ackerR, (ackerA + dAngle + Math.PI)));
+        } else {
+            setPosition(Point.getPointByAngle(_position, speed * dt, _carAngle));
+        }
+    }
+
+    // =====================================
+    // пересчет угла поворота колеса
+    // TODO ввести зависимость угла поворота от скорости и времени dt
+    private void updateWheelAngle(double dt) {
+        // поворачиваем машину вокруг точки аккермана
+        if ((keys & 4) > 0) {
+            setWheelAngle(_wheelAngle - 2 * Math.PI / 180);
+        } else {
+            if (_wheelAngle < 0) {
+                setWheelAngle(_wheelAngle + 3 * Math.PI / 180);
+            }
+        }
+        // поворачиваем машину вокруг точки аккермана
+        if ((keys & 8) > 0) {
+            setWheelAngle(_wheelAngle + 2 * Math.PI / 180);
+        } else {
+            if (_wheelAngle > 0) {
+                setWheelAngle(_wheelAngle - 3 * Math.PI / 180);
+            }
+        }
+    }
+
+    // =====================================
+    // пересчет скорости
+    private void updateSpeed(double dt) {
         double v = speed;
 
         if (fuel > 0) {
@@ -172,44 +222,13 @@ public class Car {
                 calcSpeed(axl * 0.5, dt, v, 0);
             }
         }
-        // поворачиваем машину вокруг точки аккермана
-        if ((keys & 4) > 0) {
-            setWheelAngle(_wheelAngle - 2 * Math.PI / 180);
-        } else {
-            if (_wheelAngle < 0) {
-                setWheelAngle(_wheelAngle + 3 * Math.PI / 180);
-            }
-        }
-        // поворачиваем машину вокруг точки аккермана
-        if ((keys & 8) > 0) {
-            setWheelAngle(_wheelAngle + 2 * Math.PI / 180);
-        } else {
-            if (_wheelAngle > 0) {
-                setWheelAngle(_wheelAngle - 3 * Math.PI / 180);
-            }
-        }
-        // машина не двигается и колёса стоят ровно, останавливаем анимацию
-        if ((keys == 0) && (v == 0) && (_wheelAngle == 0) && Global.requestAnimationId != null) {
-            cancelAnimationFrame(Global.requestAnimationId);
-            Global.requestAnimationId = null;
-            Utils.debug("anim-");
-            return;
-        }
+    }
 
-        double s = dt * this.speed;    // пройденный путь за dt
-        if (_wheelAngle != 0) {
-            // находим угол на который сместились за dt
-            // на какой угол повернулась машина относительно точки аккермана.
-            double dAngle = s / ackerR * (_wheelAngle > 0 ? 1 : -1);
-            // поворачиваем корпус тачки
-            setAngle(_carAngle + dAngle);
-            // находим новую позицию тачки
-            setPosition(Point.getPointByAngle(ackerP, ackerR, (ackerA + dAngle + Math.PI)));
-        } else {
-            setPosition(Point.getPointByAngle(_position, speed * dt, _carAngle));
-        }
-
-        updateSensors();
+    // =====================================
+    // пересчитываем скорость машины
+    private void calcSpeed(double axl, double dt, double vMin, double vMax) {
+        double v = speed + axl * dt;
+        speed = Math.max(Math.min(v, vMax), vMin);
     }
 
     // =====================================
@@ -222,15 +241,15 @@ public class Car {
     }
 
     // =====================================
-    // пересчитываем скорость машины
-    void calcSpeed(double axl, double dt, double vMin, double vMax) {
-        double v = speed + axl * dt;
-        speed = Math.max(Math.min(v, vMax), vMin);
+    // требуется ли анимация машины
+    public boolean isRequestAnimation() {
+        // машина не двигается и колёса стоят ровно, останавливаем анимацию
+        return (keys != 0) || (speed != 0) || (_wheelAngle != 0) || Global.requestAnimationId == null;
     }
 
     // =====================================
-    // TODO описать функцию
-    boolean checkCollisions() {
+    // проверка на выезд за трассу
+    private boolean checkCollisions() {
         // считаем что +/-2 зебры - это зона проверки столкновений
         int iMin = Math.max(stage - 2, 0);
         int iMax = Math.min(stage + 2, track.len - 1);
@@ -249,25 +268,25 @@ public class Car {
 
     // =====================================
     // проверяем между какими зебрами находимся
-    void updateProgress() {  // TODO проверить функцию. Подозрительная. почему тут не for для проверки ближайших?
+    private void updateStageProgress() {
         int st = stage;
         // проверка следующей зебры
         if (stage < track.len - 1) {
             st = stage + 1;
             // проверяем диагонали на пересечение зебры
-            if (checkIntersectionWithTrack(st) == true) return;
+            if (checkStagePass(st) == true) return;
         }
         // проверка на случай если мы едем задом наперёд
         if (stage > 0) {
             st = stage - 1;
             // проверяем диагонали на пересечение зебры
-            if (checkIntersectionWithTrack(st) == true) return;
+            if (checkStagePass(st) == true) return;
         }
     }
 
     // =====================================
-    // TODO описать функцию
-    private boolean checkIntersectionWithTrack(int stage) { // TODO какой тут stage имеется в виду?
+    // проверка на пересечение сегмента дороги с диагоналями машины
+    private boolean checkStagePass(int stage) { // TODO какой тут stage имеется в виду?
         boolean a = Line.isCrossing(track.p[1][stage], track.p[2][stage], cornerP[0], cornerP[2]);
         boolean b = Line.isCrossing(track.p[1][stage], track.p[2][stage], cornerP[1], cornerP[3]);
         if (a || b) {
@@ -279,14 +298,14 @@ public class Car {
 
     // =====================================
     // отскок машины от препятствия
-    void recoil(double dt) {
+    private void recoil(double dt) {
         setPosition(Point.getPointByAngle(_position, speed * dt * 2, _carAngle - Math.PI));
         speed = -speed / 3;
     }
 
     // =====================================
     // подготовка к старту
-    void restart() {
+    public void restart() {
         Utils.debug("Restart");
         Point p = new Point();
         setPosition(p);

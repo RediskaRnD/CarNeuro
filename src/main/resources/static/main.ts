@@ -374,17 +374,19 @@ function redrawCanvas(): void {
     lastTimeTick = t;
 
     // если машину не трогали то только отрисовываем её старое положение, вернёмся на следующем тике, с нормальным dt
+    let requestAnimation = 0;
     Global.cars.forEach((car) => {
-        if (dt > 0.1 && car.speed == 0) dt = 0.01;
-        car.updatePosition(dt);
-        // проверка на выезд за трассу
-        if (car.checkCollisions() == true) {
-            car.recoil(dt);
+        if (dt > 0.1 && car.speed == 0) dt = 0.01;  // TODO тут как то не красиво
+        car.update(dt);
+        if (car.isRequestAnimation() == true) {
+            requestAnimation++;
         }
-        car.updateProgress();
     });
-
-
+    if (requestAnimation == 0) {
+        cancelAnimationFrame(Global.requestAnimationId);
+        Global.requestAnimationId = null;
+        Utils.debug("anim-");
+    }
     if (isFollowMode == true) {
         // помещаем тачку в центр
         // offset.x = cnv.width / (2 * scale) - Global.car.getPosition().x;    // TODO не уверен что стало лучше
@@ -665,6 +667,7 @@ window.onload = () => {
 
     document.addEventListener("keydown", function (e) {
 
+        // TODO можно добавить настройки управления для каждой машины
         switch (e.target) {
             case cnv:
                 let car = Global.cars[0];
