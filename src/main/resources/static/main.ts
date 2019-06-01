@@ -502,7 +502,7 @@ function initCars(quantity: number) {
     ctx.globalCompositeOperation = "source-over";   // TODO зачем это здесь?
     Utils.debug("cars.init");
 
-    Global.cars = [];
+    Global.cars = new Array(quantity);
     for (let i = 0; i < quantity; i++) {
         Global.cars[i] = new Car(Global.track, 60, 30, 60, 300);
         Global.cars[i].sprite = new Image();
@@ -572,7 +572,7 @@ window.onload = () => {
         // проверяем что за кнопка нажата
 
         if (e.buttons & 1) {    // Left button
-            numOfPoints = pointsOfLines.push(new Point(x / scale - offset.x, y / scale - offset.y));
+            numOfPoints =  pointsOfLines.push(new Point(x / scale - offset.x, y / scale - offset.y));
 
             if (numOfPoints % 2 == 0) {
                 // проверка пересечений с кривой
