@@ -1,5 +1,6 @@
 package core;
 
+import def.dom.Image;
 import tools.Line;
 import tools.Point;
 
@@ -26,14 +27,13 @@ public class Car {
     double ackerA = 1.0 / 0.0;                  // угол между задней осью и центром тачки относительно ackerP
     double ackerR = 1.0 / 0.0;                  // радиус аккермана для центра тачки
 
-
     private Point _position = new Point();      // текущая позиция машины
     private double _carAngle = 0;               // угол машины
     private double _wheelAngle = 0;             // угол колеса машины
 
     boolean isReady = false;                    // TODO нужен ли он?
 
-    String spriteSrc = "images\\BlueCar.svg";   // TODO картинка тачки - сделать локальным ресурсом
+    Image sprite;                               // картинка машины
 
     double speed = 0;                           // текущая скорость машины
     int keys = 0;                               // зажатые кнопки управления
@@ -227,9 +227,10 @@ public class Car {
         double v = speed + axl * dt;
         speed = Math.max(Math.min(v, vMax), vMin);
     }
-    // =====================================
 
-    boolean checkCollisions(Track track) {
+    // =====================================
+    // TODO описать функцию
+    boolean checkCollisions() {
         // считаем что +/-2 зебры - это зона проверки столкновений
         int iMin = Math.max(stage - 2, 0);
         int iMax = Math.min(stage + 2, track.len - 1);
@@ -254,18 +255,19 @@ public class Car {
         if (stage < track.len - 1) {
             st = stage + 1;
             // проверяем диагонали на пересечение зебры
-            if (checkIntersectionWithTrack(track, st) == true) return;
+            if (checkIntersectionWithTrack(st) == true) return;
         }
         // проверка на случай если мы едем задом наперёд
         if (stage > 0) {
             st = stage - 1;
             // проверяем диагонали на пересечение зебры
-            if (checkIntersectionWithTrack(track, st) == true) return;
+            if (checkIntersectionWithTrack(st) == true) return;
         }
     }
-    // =====================================
 
-    private boolean checkIntersectionWithTrack(Track track, int stage) {
+    // =====================================
+    // TODO описать функцию
+    private boolean checkIntersectionWithTrack(int stage) { // TODO какой тут stage имеется в виду?
         boolean a = Line.isCrossing(track.p[1][stage], track.p[2][stage], cornerP[0], cornerP[2]);
         boolean b = Line.isCrossing(track.p[1][stage], track.p[2][stage], cornerP[1], cornerP[3]);
         if (a || b) {

@@ -10,9 +10,6 @@ import {Global} from "./core/Global";
 // var core = new Bezier([1,2,3,4]);
 // =====================================================================================================================
 
-//img : HTMLImageElement = new Image();
-let carImg = new Image();
-
 let log: HTMLElement;
 let vars: HTMLElement;
 let input: HTMLInputElement;
@@ -154,10 +151,10 @@ function drawLines(): void {
 
 // =====================================================================================================================
 // отрисовка трека
-function drawTrack(): void {
+function drawTrack(track: Track): void {
 
-    if (!Global.track === undefined) return;
-    let p: Point[][] = Global.track.p;
+    if (!track) return;
+    let p: Point[][] = track.p;
     // рисуем обочину
     ctx.lineWidth = Math.round(10 * scale);
     ctx.strokeStyle = "#444444";
@@ -195,7 +192,7 @@ function drawTrack(): void {
     // ищем левую часть вышедшую за экран
     let cp: Point = physicalToLogical(new Point(cnv.width, cnv.height));
     let bPrevIn: boolean | undefined = undefined;
-    for (let i = 0; i < Global.track.len; i++) {
+    for (let i = 0; i < track.len; i++) {
         let tp = p[1][i];
         if (tp.x < -offset.x || tp.x > cp.x || tp.y < -offset.y || tp.y > cp.y) {
             // мы за границей экрана
@@ -219,7 +216,7 @@ function drawTrack(): void {
     ctx.stroke();
     ctx.beginPath();
     bPrevIn = undefined;
-    for (let i = 0; i < Global.track.len; i++) {
+    for (let i = 0; i < track.len; i++) {
         let tp = p[2][i];
         if (tp.x < -offset.x || tp.x > cp.x || tp.y < -offset.y || tp.y > cp.y) {
             // мы за границей экрана
@@ -280,23 +277,22 @@ function drawTrack(): void {
 
 // =====================================================================================================================
 // рисуем тачку
-function drawCar(): void {
-
+function drawCar(car: Car): void {
     // рисуем радиус поворота
-    if (Global.car.getWheelAngle() != 0) {
+    if (car.getWheelAngle() != 0) {
         ctx.beginPath();
-        let tp = logicalToPhysical(Global.car.ackerP);
-        if (Global.car.getWheelAngle() > 0) {
+        let tp = logicalToPhysical(car.ackerP);
+        if (car.getWheelAngle() > 0) {
             ctx.arc(tp.x, tp.y,
-                Global.car.ackerR * scale,
-                Global.car.ackerA + Math.PI,
-                Global.car.ackerA + Math.PI * (1 + Global.car.getWheelAngle())
+                car.ackerR * scale,
+                car.ackerA + Math.PI,
+                car.ackerA + Math.PI * (1 + car.getWheelAngle())
             );
         } else {
             ctx.arc(tp.x, tp.y,
-                Global.car.ackerR * scale,
-                Global.car.ackerA + Math.PI * (1 + Global.car.getWheelAngle()),
-                Global.car.ackerA - Math.PI
+                car.ackerR * scale,
+                car.ackerA + Math.PI * (1 + car.getWheelAngle()),
+                car.ackerA - Math.PI
             );
         }
         ctx.setLineDash([6, 4]);
@@ -305,15 +301,15 @@ function drawCar(): void {
     }
     // рисуем спрайт тачки
     ctx.save();
-    let carP = logicalToPhysical(Global.car.getPosition());
+    let carP = logicalToPhysical(car.getPosition());
     ctx.translate(carP.x, carP.y);
-    ctx.rotate(Global.car.getAngle());
+    ctx.rotate(car.getAngle());
     ctx.drawImage(
-        carImg,
-        -Global.car.width / 2 * scale,
-        -Global.car.height / 2 * scale,
-        Global.car.width * scale,
-        Global.car.height * scale
+        car.sprite,
+        -car.width / 2 * scale,
+        -car.height / 2 * scale,
+        car.width * scale,
+        car.height * scale
     );
     ctx.restore();
 }
@@ -322,7 +318,7 @@ function drawCar(): void {
 // рисуем лучи сенсоров
 function drawSensors(car: Car) {
     ctx.beginPath();
-    let p = logicalToPhysical(Global.car.getPosition());
+    let p = logicalToPhysical(car.getPosition());
     car.sensors.forEach((s) => {
         if (s.intersection == null) return;
         ctx.moveTo(p.x, p.y);
@@ -378,19 +374,22 @@ function redrawCanvas(): void {
     lastTimeTick = t;
 
     // если машину не трогали то только отрисовываем её старое положение, вернёмся на следующем тике, с нормальным dt
-    if (dt > 0.1 && Global.car.speed == 0) dt = 0.01;
-    Global.car.updatePosition(dt);
-    // проверка на выезд за трассу
-    if (Global.car.checkCollisions(Global.track) == true) {
-        Global.car.recoil(dt);
-    }
-    Global.car.updateProgress();
+    Global.cars.forEach((car) => {
+        if (dt > 0.1 && car.speed == 0) dt = 0.01;
+        car.updatePosition(dt);
+        // проверка на выезд за трассу
+        if (car.checkCollisions() == true) {
+            car.recoil(dt);
+        }
+        car.updateProgress();
+    });
+
 
     if (isFollowMode == true) {
         // помещаем тачку в центр
         // offset.x = cnv.width / (2 * scale) - Global.car.getPosition().x;    // TODO не уверен что стало лучше
         // offset.y = cnv.height / (2 * scale) - Global.car.getPosition().y;
-        offset = Point.sub(new Point(cnv.width / (2 * scale), cnv.height / (2 * scale)), Global.car.getPosition());
+        offset = Point.sub(new Point(cnv.width / (2 * scale), cnv.height / (2 * scale)), Global.cars[0].getPosition());
     } else {
         // переносим центральную точку обзора в центр нового канваса.
         // let xOff = (cnv.clientWidth - cnv.width) / 2;
@@ -401,12 +400,14 @@ function redrawCanvas(): void {
         offset = Point.sum(shift, offset);
     }
     fillVars();
-    if (Global.track) drawTrack();
+    drawTrack(Global.track);
     drawLines();
     drawCrossPoints();
     //drawGrid();
-    drawSensors(Global.car);
-    drawCar();
+    Global.cars.forEach((car) => {
+        drawSensors(car);
+        drawCar(car);
+    });
 }
 
 // =====================================================================================================================
@@ -473,9 +474,9 @@ function fillVars(): void {
     //     VirtMP:[${Math.round(virtualMousePosition.x)}, ${Math.round(virtualMousePosition.y)}]`;
 
     str +=
-        `\nCar.p: [${Math.round(Global.car.getPosition().x)}, ${Math.round(Global.car.getPosition().y)}]
+        `\nCar.p: [${Math.round(Global.cars[0].getPosition().x)}, ${Math.round(Global.cars[0].getPosition().y)}]
         
-        Speed: [${Math.round(Global.car.speed)}]`;
+        Speed: [${Math.round(Global.cars[0].speed)}]`;
 
     // str += `\nAckP : [${Math.round(Global.car.ackerP.x)}, ${Math.round(Global.car.ackerP.y)}]
     //     AckR.: [${Math.round(Global.car.ackerR)}]
@@ -484,15 +485,40 @@ function fillVars(): void {
     //     Angle: [${Math.round(Global.car.angle * 180 / Math.PI)}]
     //     Keys.: [${Global.car.keys}]`;
 
-    str += `\nStage: [${Global.car.stage}]`;
+    str += `\nStage: [${Global.cars[0].stage}]`;
 
     let dt = performance.now() - lastTimeTick;
 
     str += `\nTick: [${Math.round(dt)}]`;
-
-    str += `\nIndex: [1: ${Global.index[0]}, 2: ${Global.index[1]}]`;
-    str += `\n step: ${Global.index[2]}, inv: ${Global.index[3]}, i: ${Global.index[4]}]`;
     vars.innerText = str;
+}
+
+// =====================================================================================================================
+// инициализируем машины
+function initCars(quantity: number) {
+
+    ctx.globalCompositeOperation = "source-over";   // TODO зачем это здесь?
+    Utils.debug("cars.init");
+
+    Global.cars = [];
+    for (let i = 0; i < quantity; i++) {
+        Global.cars[i] = new Car(Global.track, 60, 30, 60, 300);
+        Global.cars[i].sprite = new Image();
+        let src;
+        switch (i) {
+            case 0:
+                src = "images\\BlueCar.svg";
+                break;
+            default:
+                src = "images\\WhiteCar.png";
+        }
+        Global.cars[i].sprite.src = src;
+        Global.cars[i].sprite.onload = () => {
+            Utils.debug("sprite[" + i + "]");
+            Global.cars[i].restart();
+            if (Global.requestAnimationId === null) redrawCanvas();
+        };
+    }
 }
 
 // =====================================================================================================================
@@ -522,18 +548,7 @@ window.onload = () => {
         researchCrossPointsWithCurve();
         // если загрузились все файлы - начинаем подготовку к старту.
         if (Global.track != null) {
-            // инициализируем машину
-            Utils.debug("car.init");
-            Global.car = new Car(Global.track, 60, 30, 60, 300);
-
-            ctx.globalCompositeOperation = "source-over";
-
-            carImg.src = Global.car.spriteSrc;
-            carImg.onload = () => {
-                Utils.debug("sprite");
-                Global.car.restart();
-            };
-            if (Global.requestAnimationId === null) redrawCanvas();
+            initCars(2);
         }
         //if (Global.car.isReady && Global.track) Global.car.restart();
     });
@@ -652,35 +667,36 @@ window.onload = () => {
 
         switch (e.target) {
             case cnv:
+                let car = Global.cars[0];
                 let redrawRequest = 0;
                 // управление машиной
                 if (e.code === "KeyW" || e.code === "ArrowUp") {
-                    Global.car.keys |= 1;
+                    car.keys |= 1;
                     redrawRequest = 2;
                 }
                 if (e.code === "KeyS" || e.code === "ArrowDown") {
-                    Global.car.keys |= 2;
+                    car.keys |= 2;
                     redrawRequest = 2;
                 }
                 if (e.code === "KeyA" || e.code === "ArrowLeft") {
-                    Global.car.keys |= 4;
+                    car.keys |= 4;
                     redrawRequest = Math.max(redrawRequest, 1);
                 }
                 if (e.code === "KeyD" || e.code === "ArrowRight") {
-                    Global.car.keys |= 8;
+                    car.keys |= 8;
                     redrawRequest = Math.max(redrawRequest, 1);
                 }
                 if (e.code === "KeyQ") {
-                    //Global.car.keys |= 16;
+                    //car.keys |= 16;
                     redrawRequest = 2;
                 }
                 if (e.code === "KeyE") {
-                    //Global.car.keys |= 32;
+                    //car.keys |= 32;
                     redrawRequest = 2;
                 }
                 // рестарт
                 if (e.code === "KeyR") {
-                    Global.car.restart();
+                    car.restart();
                     redrawRequest = 1;
                 }
                 if (e.code === "Space") {
@@ -724,12 +740,13 @@ window.onload = () => {
     document.addEventListener("keyup", function (e) {
 
         if (e.target === cnv) {
-            if (e.code === "KeyW" || e.code === "ArrowUp") Global.car.keys &= ~1;
-            if (e.code === "KeyS" || e.code === "ArrowDown") Global.car.keys &= ~2;
-            if (e.code === "KeyA" || e.code === "ArrowLeft") Global.car.keys &= ~4;
-            if (e.code === "KeyD" || e.code === "ArrowRight") Global.car.keys &= ~8;
-            if (e.code === "KeyQ") Global.car.keys &= ~16;
-            if (e.code === "KeyE") Global.car.keys &= ~32;
+            let car = Global.cars[0];
+            if (e.code === "KeyW" || e.code === "ArrowUp") car.keys &= ~1;
+            if (e.code === "KeyS" || e.code === "ArrowDown") car.keys &= ~2;
+            if (e.code === "KeyA" || e.code === "ArrowLeft") car.keys &= ~4;
+            if (e.code === "KeyD" || e.code === "ArrowRight") car.keys &= ~8;
+            if (e.code === "KeyQ") car.keys &= ~16;
+            if (e.code === "KeyE") car.keys &= ~32;
         }
     });
     // =====================================
