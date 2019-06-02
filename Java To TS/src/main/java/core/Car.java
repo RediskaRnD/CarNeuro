@@ -29,7 +29,7 @@ public class Car {
 
     boolean isReady = false;                    // TODO нужен ли он?
 
-    public Object sprite;                       // картинка машины
+    public Object image;                        // картинка машины
 
     double speed = 0;                           // текущая скорость машины
     public int keys = 0;                        // зажатые кнопки управления

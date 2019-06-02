@@ -54,9 +54,13 @@ public class Point {
 
     // =====================================
     @Override
+    // toString - (x, y)
     public String toString() {
         return "(" + x + ", " + y + ")";
-//        return String.format("(%d, %d)", x, y);
-//        return Globals.sprintf(("core"));
+    }
+    // to String - (x, y) but rounded
+    public String toString(int n) {
+        n = (int) Math.pow(10, n);
+        return "(" + Math.round(x * n) / n + ", " + Math.round(y * n) / n + ")";
     }
 }

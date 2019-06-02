@@ -5,6 +5,8 @@ import {ColorPoint} from "./tools/ColorPoint";
 import {Utils} from "./core/Utils";
 import {Line} from "./tools/Line";
 import {Global} from "./core/Global";
+import {Player} from "./core/Player";
+import {Key} from "./core/Key";
 
 
 // var core = new Bezier([1,2,3,4]);
@@ -305,7 +307,7 @@ function drawCar(car: Car): void {
     ctx.translate(carP.x, carP.y);
     ctx.rotate(car.getAngle());
     ctx.drawImage(
-        car.sprite,
+        car.image,
         -car.width / 2 * scale,
         -car.height / 2 * scale,
         car.width * scale,
@@ -325,6 +327,8 @@ function drawSensors(car: Car) {
         let tp = logicalToPhysical(s.intersection);
         ctx.lineTo(tp.x, tp.y);
     });
+    ctx.setLineDash([6, 4]);
+    ctx.strokeStyle = "#999999";
     ctx.stroke();
 }
 
@@ -375,7 +379,8 @@ function redrawCanvas(): void {
 
     // если машину не трогали то только отрисовываем её старое положение, вернёмся на следующем тике, с нормальным dt
     let requestAnimation = 0;
-    Global.cars.forEach((car) => {
+    Global.players.forEach((p) => {
+        let car = p.car;
         if (dt > 0.1 && car.speed == 0) dt = 0.01;  // TODO тут как то не красиво
         car.update(dt);
         if (car.isRequestAnimation() == true) {
@@ -391,7 +396,7 @@ function redrawCanvas(): void {
         // помещаем тачку в центр
         // offset.x = cnv.width / (2 * scale) - Global.car.getPosition().x;    // TODO не уверен что стало лучше
         // offset.y = cnv.height / (2 * scale) - Global.car.getPosition().y;
-        offset = Point.sub(new Point(cnv.width / (2 * scale), cnv.height / (2 * scale)), Global.cars[0].getPosition());
+        offset = Point.sub(new Point(cnv.width / (2 * scale), cnv.height / (2 * scale)), Global.players[0].car.getPosition());
     } else {
         // переносим центральную точку обзора в центр нового канваса.
         // let xOff = (cnv.clientWidth - cnv.width) / 2;
@@ -406,9 +411,9 @@ function redrawCanvas(): void {
     drawLines();
     drawCrossPoints();
     //drawGrid();
-    Global.cars.forEach((car) => {
-        drawSensors(car);
-        drawCar(car);
+    Global.players.forEach((p) => {
+        drawSensors(p.car);
+        drawCar(p.car);
     });
 }
 
@@ -454,7 +459,7 @@ function fillVars(): void {
 
     let str = `FPS: . [${Math.round(fps)}]
     Scale: [${Math.round(scale * 1000) / 1000}]
-    Offset:[${Math.round(offset.x)}, ${Math.round(offset.y)}]`;
+    Offset:${offset.toString(0)}`;
     // if (track != undefined) {
     //     str += `\nTrack[0]:.[${track.points[0][0].x}, ${track.points[0][0].y}]
     //     Track[N]:.[${track.points[0][track.distance - 1].x}, ${track.points[0][track.distance - 1].y}]
@@ -476,18 +481,18 @@ function fillVars(): void {
     //     VirtMP:[${Math.round(virtualMousePosition.x)}, ${Math.round(virtualMousePosition.y)}]`;
 
     str +=
-        `\nCar.p: [${Math.round(Global.cars[0].getPosition().x)}, ${Math.round(Global.cars[0].getPosition().y)}]
-        
-        Speed: [${Math.round(Global.cars[0].speed)}]`;
+        `\nCar.p: ${Global.players[0].car.getPosition().toString(0)}
+
+        Speed: ${Math.round(Global.players[0].car.speed)}`;
 
     // str += `\nAckP : [${Math.round(Global.car.ackerP.x)}, ${Math.round(Global.car.ackerP.y)}]
     //     AckR.: [${Math.round(Global.car.ackerR)}]
     //     AckA.: [${Math.round(Global.car.ackerA * 180 / Math.PI)}]
     //     Wheel: [${Math.round(Global.car.getWheelAngle() * 180 / Math.PI)}]
     //     Angle: [${Math.round(Global.car.angle * 180 / Math.PI)}]
-    //     Keys.: [${Global.car.keys}]`;
+    //     Key.: [${Global.car.keys}]`;
 
-    str += `\nStage: [${Global.cars[0].stage}]`;
+    str += `\nStage: [${Global.players[0].car.stage}]`;
 
     let dt = performance.now() - lastTimeTick;
 
@@ -497,33 +502,76 @@ function fillVars(): void {
 
 // =====================================================================================================================
 // инициализируем машины
-function initCars(quantity: number) {
+// function initCars(quantity: number) {
+//
+//     ctx.globalCompositeOperation = "source-over";   // TODO зачем это здесь?
+//     Utils.debug("cars.init");
+//
+//     Global.cars = new Array(quantity);
+//     for (let i = 0; i < quantity; i++) {
+//         Global.cars[i] = new Car(Global.track, 60, 30, 60, 300);
+//         Global.cars[i].image = new Image();
+//         let src;
+//         switch (i) {
+//             case 0:
+//                 src = "images\\BlueCar.svg";
+//                 break;
+//             default:
+//                 src = "images\\WhiteCar.png";
+//         }
+//         Global.cars[i].image.src = src;
+//         Global.cars[i].image.onload = () => {
+//             Utils.debug("image[" + i + "]");
+//             Global.cars[i].restart();
+//             if (Global.requestAnimationId === null) redrawCanvas();
+//         };
+//     }
+// }
 
-    ctx.globalCompositeOperation = "source-over";   // TODO зачем это здесь?
-    Utils.debug("cars.init");
-
-    Global.cars = new Array(quantity);
-    for (let i = 0; i < quantity; i++) {
-        Global.cars[i] = new Car(Global.track, 60, 30, 60, 300);
-        Global.cars[i].sprite = new Image();
-        let src;
-        switch (i) {
-            case 0:
-                src = "images\\BlueCar.svg";
-                break;
-            default:
-                src = "images\\WhiteCar.png";
-        }
-        Global.cars[i].sprite.src = src;
-        Global.cars[i].sprite.onload = () => {
-            Utils.debug("sprite[" + i + "]");
-            Global.cars[i].restart();
-            if (Global.requestAnimationId === null) redrawCanvas();
-        };
+// =====================================================================================================================
+// проверка нажатия кнопки игроком
+// return redrawRequest:
+// 0 - нажатий нет
+// 1 - нажатие есть, перерисовываем картинку
+// 2 - нажатие есть, запускаем анимацию
+function checkKeyDown(e: KeyboardEvent, player: Player): number {
+    switch (e.code) {
+        case player.keyCodes[Key.FORWARD]:
+            player.car.keys |= 1;
+            return 2;
+        case player.keyCodes[Key.BACK]:
+            player.car.keys |= 2;
+            return 2;
+        case player.keyCodes[Key.LEFT]:
+            player.car.keys |= 4;
+            return 1;
+        case player.keyCodes[Key.RIGHT]:
+            player.car.keys |= 8;
+            return 1;
     }
+    return 0;
 }
 
 // =====================================================================================================================
+
+function checkKeyUp(e: KeyboardEvent, player: Player) {
+    switch (e.code) {
+        case player.keyCodes[Key.FORWARD]:
+            player.car.keys &= ~1;
+            return 2;
+        case player.keyCodes[Key.BACK]:
+            player.car.keys &= ~2;
+            return 2;
+        case player.keyCodes[Key.LEFT]:
+            player.car.keys &= ~4;
+            return 1;
+        case player.keyCodes[Key.RIGHT]:
+            player.car.keys &= ~8;
+            return 1;
+    }
+    return 0;
+}
+
 // Init
 window.onload = () => {
 
@@ -550,7 +598,31 @@ window.onload = () => {
         researchCrossPointsWithCurve();
         // если загрузились все файлы - начинаем подготовку к старту.
         if (Global.track != null) {
-            initCars(2);
+            //initCars(2);
+            Global.players = [];
+            Global.players.push(new Player("Rediska"));
+            let player = Global.players[0];
+            player.setKeys("KeyW", "KeyS", "KeyA", "KeyD");
+            player.car = new Car(Global.track, 60, 30, 60, 300);
+            player.car.image = new Image();
+            player.car.image.src = "images\\BlueCar.svg";
+            player.car.image.onload = () => {
+                Utils.debug(Global.players[0].name + " car is ready!");
+                Global.players[0].car.restart();
+                if (Global.requestAnimationId === null) redrawCanvas();
+            };
+
+            Global.players.push(new Player("RDX"));
+            player = Global.players[1];
+            player.setKeys("ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight");
+            player.car = new Car(Global.track, 60, 30, 60, 300);
+            player.car.image = new Image();
+            player.car.image.src = "images\\WhiteCar.png";
+            player.car.image.onload = () => {
+                Utils.debug(Global.players[1].name + " car is ready!");
+                Global.players[1].car.restart();
+                if (Global.requestAnimationId === null) redrawCanvas();
+            };
         }
         //if (Global.car.isReady && Global.track) Global.car.restart();
     });
@@ -572,7 +644,7 @@ window.onload = () => {
         // проверяем что за кнопка нажата
 
         if (e.buttons & 1) {    // Left button
-            numOfPoints =  pointsOfLines.push(new Point(x / scale - offset.x, y / scale - offset.y));
+            numOfPoints = pointsOfLines.push(new Point(x / scale - offset.x, y / scale - offset.y));
 
             if (numOfPoints % 2 == 0) {
                 // проверка пересечений с кривой
@@ -667,51 +739,10 @@ window.onload = () => {
 
     document.addEventListener("keydown", function (e) {
 
-        // TODO можно добавить настройки управления для каждой машины
         switch (e.target) {
             case cnv:
-                let car = Global.cars[0];
-                let redrawRequest = 0;
-                // управление машиной
-                if (e.code === "KeyW" || e.code === "ArrowUp") {
-                    car.keys |= 1;
-                    redrawRequest = 2;
-                }
-                if (e.code === "KeyS" || e.code === "ArrowDown") {
-                    car.keys |= 2;
-                    redrawRequest = 2;
-                }
-                if (e.code === "KeyA" || e.code === "ArrowLeft") {
-                    car.keys |= 4;
-                    redrawRequest = Math.max(redrawRequest, 1);
-                }
-                if (e.code === "KeyD" || e.code === "ArrowRight") {
-                    car.keys |= 8;
-                    redrawRequest = Math.max(redrawRequest, 1);
-                }
-                if (e.code === "KeyQ") {
-                    //car.keys |= 16;
-                    redrawRequest = 2;
-                }
-                if (e.code === "KeyE") {
-                    //car.keys |= 32;
-                    redrawRequest = 2;
-                }
-                // рестарт
-                if (e.code === "KeyR") {
-                    car.restart();
-                    redrawRequest = 1;
-                }
-                if (e.code === "Space") {
-                    if (e.ctrlKey == true) {
-                        getTrack();
-                    } else {
-
-                        // просто перерисовываем канвас
-                        //redrawRequest = redrawRequest > 1 ? redrawRequest : 1;
-                    }
-                    break;
-                }
+                let redrawRequest = checkKeyDown(e, Global.players[0]);
+                if (redrawRequest == 0) redrawRequest |= checkKeyDown(e, Global.players[1]);
                 switch (redrawRequest) {
                     case 1:
                         // просто перерисовываем канвас
@@ -725,8 +756,13 @@ window.onload = () => {
                         }
                         break;
                 }
+                if (e.code === "Space") {
+                    if (e.ctrlKey === true) {
+                        getTrack();
+                    }
+                    break;
+                }
                 break;
-
             case input:
                 if (e.code === "Enter") {
                     e.preventDefault();
@@ -741,15 +777,10 @@ window.onload = () => {
     // =====================================
 
     document.addEventListener("keyup", function (e) {
-
+    // TODO либо удалить redrawRequest, либо добавить
         if (e.target === cnv) {
-            let car = Global.cars[0];
-            if (e.code === "KeyW" || e.code === "ArrowUp") car.keys &= ~1;
-            if (e.code === "KeyS" || e.code === "ArrowDown") car.keys &= ~2;
-            if (e.code === "KeyA" || e.code === "ArrowLeft") car.keys &= ~4;
-            if (e.code === "KeyD" || e.code === "ArrowRight") car.keys &= ~8;
-            if (e.code === "KeyQ") car.keys &= ~16;
-            if (e.code === "KeyE") car.keys &= ~32;
+            let redrawRequest = checkKeyUp(e, Global.players[0]);
+            if (redrawRequest == 0) redrawRequest |= checkKeyUp(e, Global.players[1]);
         }
     });
     // =====================================
@@ -760,6 +791,7 @@ window.onload = () => {
 
     cnv.tabIndex = 0;   // если убрать tabIndex то не будет работать event cnv.keyDown
     getTrack();
+
     cnv.focus();
 };
 // =====================================================================================================================
