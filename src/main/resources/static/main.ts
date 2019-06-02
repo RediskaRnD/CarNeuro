@@ -321,14 +321,14 @@ function drawCar(car: Car): void {
 function drawSensors(car: Car) {
     ctx.beginPath();
     let p = logicalToPhysical(car.getPosition());
-    car.sensors.forEach((s) => {
+    car.sensors.forEach(s => {
         if (s.intersection == null) return;
         ctx.moveTo(p.x, p.y);
         let tp = logicalToPhysical(s.intersection);
         ctx.lineTo(tp.x, tp.y);
     });
     ctx.setLineDash([6, 4]);
-    ctx.strokeStyle = "#999999";
+    ctx.strokeStyle = "#bbbbbb";
     ctx.stroke();
 }
 
@@ -379,7 +379,7 @@ function redrawCanvas(): void {
 
     // если машину не трогали то только отрисовываем её старое положение, вернёмся на следующем тике, с нормальным dt
     let requestAnimation = 0;
-    Global.players.forEach((p) => {
+    Global.players.forEach(p => {
         let car = p.car;
         if (dt > 0.1 && car.speed == 0) dt = 0.01;  // TODO тут как то не красиво
         car.update(dt);
@@ -411,7 +411,7 @@ function redrawCanvas(): void {
     drawLines();
     drawCrossPoints();
     //drawGrid();
-    Global.players.forEach((p) => {
+    Global.players.forEach(p => {
         drawSensors(p.car);
         drawCar(p.car);
     });
@@ -456,7 +456,7 @@ function fillVars(): void {
     /// MouseEvent.arguments.clientX  не работает так как хотелось бы!!!
     // let x = MouseEvent.arguments != null ? MouseEvent.arguments.clientX : 0;
     // let y = MouseEvent.arguments != null ? MouseEvent.arguments.clientY : 0;
-
+    let car = Global.players[0].car;
     let str = `FPS: . [${Math.round(fps)}]
     Scale: [${Math.round(scale * 1000) / 1000}]
     Offset:${offset.toString(0)}`;
@@ -481,52 +481,24 @@ function fillVars(): void {
     //     VirtMP:[${Math.round(virtualMousePosition.x)}, ${Math.round(virtualMousePosition.y)}]`;
 
     str +=
-        `\nCar.p: ${Global.players[0].car.getPosition().toString(0)}
+        `\nCar.p: ${car.getPosition().toString(0)}
 
-        Speed: ${Math.round(Global.players[0].car.speed)}`;
+        Speed: ${Math.round(car.speed)}`;
 
-    // str += `\nAckP : [${Math.round(Global.car.ackerP.x)}, ${Math.round(Global.car.ackerP.y)}]
-    //     AckR.: [${Math.round(Global.car.ackerR)}]
-    //     AckA.: [${Math.round(Global.car.ackerA * 180 / Math.PI)}]
-    //     Wheel: [${Math.round(Global.car.getWheelAngle() * 180 / Math.PI)}]
-    //     Angle: [${Math.round(Global.car.angle * 180 / Math.PI)}]
-    //     Key.: [${Global.car.keys}]`;
+    str += `\nAckP : ${car.ackerP.toString(0)}
+        AckR.: [${Math.round(car.ackerR)}]
+        AckA.: [${Math.round(car.ackerA * 180 / Math.PI)}]
+        Wheel: [${Math.round(car.getWheelAngle() * 180 / Math.PI)}]
+        Angle: [${Math.round(car.getAngle() * 180 / Math.PI)}]
+        Key.: [${car.keys}]`;
 
-    str += `\nStage: [${Global.players[0].car.stage}]`;
+    str += `\nStage: [${car.stage}]`;
 
     let dt = performance.now() - lastTimeTick;
 
     str += `\nTick: [${Math.round(dt)}]`;
     vars.innerText = str;
 }
-
-// =====================================================================================================================
-// инициализируем машины
-// function initCars(quantity: number) {
-//
-//     ctx.globalCompositeOperation = "source-over";   // TODO зачем это здесь?
-//     Utils.debug("cars.init");
-//
-//     Global.cars = new Array(quantity);
-//     for (let i = 0; i < quantity; i++) {
-//         Global.cars[i] = new Car(Global.track, 60, 30, 60, 300);
-//         Global.cars[i].image = new Image();
-//         let src;
-//         switch (i) {
-//             case 0:
-//                 src = "images\\BlueCar.svg";
-//                 break;
-//             default:
-//                 src = "images\\WhiteCar.png";
-//         }
-//         Global.cars[i].image.src = src;
-//         Global.cars[i].image.onload = () => {
-//             Utils.debug("image[" + i + "]");
-//             Global.cars[i].restart();
-//             if (Global.requestAnimationId === null) redrawCanvas();
-//         };
-//     }
-// }
 
 // =====================================================================================================================
 // проверка нажатия кнопки игроком
@@ -572,6 +544,62 @@ function checkKeyUp(e: KeyboardEvent, player: Player) {
     return 0;
 }
 
+// =====================================================================================================================
+// инициализируем машины
+// function initCars(quantity: number) {
+//
+//     ctx.globalCompositeOperation = "source-over";   // TODO зачем это здесь?
+//     Utils.debug("cars.init");
+//
+//     Global.cars = new Array(quantity);
+//     for (let i = 0; i < quantity; i++) {
+//         Global.cars[i] = new Car(Global.track, 60, 30, 60, 300);
+//         Global.cars[i].image = new Image();
+//         let src;
+//         switch (i) {
+//             case 0:
+//                 src = "images\\BlueCar.svg";
+//                 break;
+//             default:
+//                 src = "images\\WhiteCar.png";
+//         }
+//         Global.cars[i].image.src = src;
+//         Global.cars[i].image.onload = () => {
+//             Utils.debug("image[" + i + "]");
+//             Global.cars[i].restart();
+//             if (Global.requestAnimationId === null) redrawCanvas();
+//         };
+//     }
+// }
+// =====================================================================================================================
+// инициализация игроков
+function initPlayers() {
+    Global.players = [];
+    Global.players.push(new Player("Rediska"));
+    let player = Global.players[0];
+    player.setKeys("KeyW", "KeyS", "KeyA", "KeyD");
+    player.car = new Car(Global.track, 60, 30, 60, 300);
+    player.car.image = new Image();
+    player.car.image.src = "images\\BlueCar.svg";
+    player.car.image.onload = () => {
+        Utils.debug(Global.players[0].name + " car is ready!");
+        Global.players[0].car.restart();
+        if (Global.requestAnimationId === null) redrawCanvas();
+    };
+
+    Global.players.push(new Player("RDX"));
+    player = Global.players[1];
+    player.setKeys("ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight");
+    player.car = new Car(Global.track, 60, 30, 60, 300);
+    player.car.image = new Image();
+    player.car.image.src = "images\\WhiteCar.png";
+    player.car.image.onload = () => {
+        Utils.debug(Global.players[1].name + " car is ready!");
+        Global.players[1].car.restart();
+        if (Global.requestAnimationId === null) redrawCanvas();
+    };
+}
+
 // Init
 window.onload = () => {
 
@@ -589,46 +617,22 @@ window.onload = () => {
 
     // =====================================
 
-    document.addEventListener("onLoad", function () {
+    document.addEventListener("onLoad", () => {
 
         Utils.debug("onLoad");
         // ставим тачку в центр
         offset.x = cnv.width / 2;
         offset.y = cnv.height / 2;
         researchCrossPointsWithCurve();
-        // если загрузились все файлы - начинаем подготовку к старту.
+        // если загрузились все файлы - начинаем подготовку к старту. // TODO а тут точно произошла загрузка всех файлов?
         if (Global.track != null) {
             //initCars(2);
-            Global.players = [];
-            Global.players.push(new Player("Rediska"));
-            let player = Global.players[0];
-            player.setKeys("KeyW", "KeyS", "KeyA", "KeyD");
-            player.car = new Car(Global.track, 60, 30, 60, 300);
-            player.car.image = new Image();
-            player.car.image.src = "images\\BlueCar.svg";
-            player.car.image.onload = () => {
-                Utils.debug(Global.players[0].name + " car is ready!");
-                Global.players[0].car.restart();
-                if (Global.requestAnimationId === null) redrawCanvas();
-            };
-
-            Global.players.push(new Player("RDX"));
-            player = Global.players[1];
-            player.setKeys("ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight");
-            player.car = new Car(Global.track, 60, 30, 60, 300);
-            player.car.image = new Image();
-            player.car.image.src = "images\\WhiteCar.png";
-            player.car.image.onload = () => {
-                Utils.debug(Global.players[1].name + " car is ready!");
-                Global.players[1].car.restart();
-                if (Global.requestAnimationId === null) redrawCanvas();
-            };
+            initPlayers();
         }
-        //if (Global.car.isReady && Global.track) Global.car.restart();
     });
     // =====================================
 
-    cnv.addEventListener("mousedown", function (e) {
+    cnv.addEventListener("mousedown", e => {
 
         isMouseDown = true;
 
@@ -642,7 +646,6 @@ window.onload = () => {
         let numOfPoints;
 
         // проверяем что за кнопка нажата
-
         if (e.buttons & 1) {    // Left button
             numOfPoints = pointsOfLines.push(new Point(x / scale - offset.x, y / scale - offset.y));
 
@@ -693,13 +696,13 @@ window.onload = () => {
     });
     // =====================================
 
-    cnv.addEventListener("mouseup", function () {
+    cnv.addEventListener("mouseup", () => {
 
         isMouseDown = false;
     });
     // =====================================
 
-    cnv.addEventListener("mousemove", function (e) {
+    cnv.addEventListener("mousemove", e => {
 
         virtualMousePosition = physicalToLogical(new Point(e.clientX, e.clientY));
         if (isMouseDown == false) {
@@ -721,7 +724,7 @@ window.onload = () => {
     });
     // =====================================
 
-    cnv.addEventListener("wheel", function (e) {
+    cnv.addEventListener("wheel", e => {
 
         // e.preventDefault();
         // e.stopPropagation();
@@ -730,14 +733,14 @@ window.onload = () => {
     }, {passive: true});
     // =====================================
 
-    cnv.addEventListener('contextmenu', function (e) {
+    cnv.addEventListener('contextmenu', e => {
 
         e.preventDefault();
         e.stopPropagation();
     });
     // =====================================
 
-    document.addEventListener("keydown", function (e) {
+    document.addEventListener("keydown", e => {
 
         switch (e.target) {
             case cnv:
@@ -776,8 +779,8 @@ window.onload = () => {
     });
     // =====================================
 
-    document.addEventListener("keyup", function (e) {
-    // TODO либо удалить redrawRequest, либо добавить
+    document.addEventListener("keyup", e => {
+        // TODO либо удалить redrawRequest, либо добавить
         if (e.target === cnv) {
             let redrawRequest = checkKeyUp(e, Global.players[0]);
             if (redrawRequest == 0) redrawRequest |= checkKeyUp(e, Global.players[1]);

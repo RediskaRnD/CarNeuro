@@ -99,7 +99,7 @@ public class Car {
     private void setWheelAngle(double value) {
         _wheelAngle = Math.min(Math.max(value, -maxWheelAngle), maxWheelAngle);
         // если угол поворота колеса меньше 1 градуса то округляем его до 0
-        if (Math.abs(this._wheelAngle) <= Math.PI / 180) {
+        if (Math.abs(this._wheelAngle) < Math.PI / 179) {
             _wheelAngle = 0;
         } else {
             // ищем точку аккермана
@@ -161,7 +161,7 @@ public class Car {
     // TODO ввести зависимость угла поворота от скорости и времени dt
     private void updateWheelAngle(double dt) {
         // поворачиваем машину вокруг точки аккермана
-        if ((keys & 4) > 0) {
+        if ((keys & (1 << Key.LEFT.ordinal())) > 0) {
             setWheelAngle(_wheelAngle - 2 * Math.PI / 180);
         } else {
             if (_wheelAngle < 0) {
@@ -169,7 +169,7 @@ public class Car {
             }
         }
         // поворачиваем машину вокруг точки аккермана
-        if ((keys & 8) > 0) {
+        if ((keys & (1 << Key.RIGHT.ordinal())) > 0) {
             setWheelAngle(_wheelAngle + 2 * Math.PI / 180);
         } else {
             if (_wheelAngle > 0) {
@@ -185,7 +185,7 @@ public class Car {
 
         if (fuel > 0) {
             // ускоряемся вперед
-            if ((keys & 1) > 0) {
+            if ((keys & (1 << Key.FORWARD.ordinal())) > 0) {
                 if (v < 0) {
                     // тормозим
                     calcSpeed(axl * 2, dt, v, 0);
@@ -200,7 +200,7 @@ public class Car {
                 }
             }
             // ускоряемся назад
-            if ((keys & 2) > 0) {
+            if ((keys & (1 << Key.BACK.ordinal())) > 0) {
                 if (v > 0) {
                     // тормозим
                     calcSpeed(-axl * 2, dt, 0, v);
