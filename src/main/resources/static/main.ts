@@ -456,10 +456,9 @@ function fillVars(): void {
     /// MouseEvent.arguments.clientX  не работает так как хотелось бы!!!
     // let x = MouseEvent.arguments != null ? MouseEvent.arguments.clientX : 0;
     // let y = MouseEvent.arguments != null ? MouseEvent.arguments.clientY : 0;
-    let car = Global.players[0].car;
-    let str = `FPS: . [${Math.round(fps)}]
-    Scale: [${Math.round(scale * 1000) / 1000}]
-    Offset:${offset.toString(0)}`;
+    let str = `FPS .: ${Math.round(fps)}`;
+    str += `\nScale: ${Math.round(scale * 1000) / 1000}`;
+    //str += `\nOffset:${offset.toString(0)}`;
     // if (track != undefined) {
     //     str += `\nTrack[0]:.[${track.points[0][0].x}, ${track.points[0][0].y}]
     //     Track[N]:.[${track.points[0][track.distance - 1].x}, ${track.points[0][track.distance - 1].y}]
@@ -480,23 +479,30 @@ function fillVars(): void {
     //     CnvCWH:[${cnv.clientWidth}, ${cnv.clientHeight}]
     //     VirtMP:[${Math.round(virtualMousePosition.x)}, ${Math.round(virtualMousePosition.y)}]`;
 
-    str +=
-        `\nCar.p: ${car.getPosition().toString(0)}
+    str += `\n\n${Global.players[0].name}`;
+    let car = Global.players[0].car;
 
-        Speed: ${Math.round(car.speed)}`;
+    str += `\nSpeed: ${Math.round(car.speed)}`;
+    str += `\nDist : ${Math.round(car.distance)}`;
+    str += `\nStage: ${car.stage}`;
+    str += `\nKeys : ${car.keys}`;
 
-    str += `\nAckP : ${car.ackerP.toString(0)}
-        AckR.: [${Math.round(car.ackerR)}]
-        AckA.: [${Math.round(car.ackerA * 180 / Math.PI)}]
-        Wheel: [${Math.round(car.getWheelAngle() * 180 / Math.PI)}]
-        Angle: [${Math.round(car.getAngle() * 180 / Math.PI)}]
-        Key.: [${car.keys}]`;
+    str += `\n\n${Global.players[1].name}`;
+    car = Global.players[1].car;
+    str += `\nSpeed: ${Math.round(car.speed)}`;
+    str += `\nDist : ${Math.round(car.distance)}`;
+    str += `\nStage: ${car.stage}`;
+    str += `\nKeys : ${car.keys}`;
 
-    str += `\nStage: [${car.stage}]`;
+    //str += `\nCar.p: ${car.getPosition().toString(0)}`;
+    // str += `\nAckP : ${car.ackerP.toString(0)}`;
+    // str += `\AckR.: [${Math.round(car.ackerR)}]`;
+    // str += `\AckA.: [${Math.round(car.ackerA * 180 / Math.PI)}]`;
+    // str += `\Wheel: [${Math.round(car.getWheelAngle() * 180 / Math.PI)}]`;
+    // str += `\Angle: [${Math.round(car.getAngle() * 180 / Math.PI)}]`;
 
-    let dt = performance.now() - lastTimeTick;
-
-    str += `\nTick: [${Math.round(dt)}]`;
+    // let dt = performance.now() - lastTimeTick;
+    // str += `\nTick: [${Math.round(dt)}]`;
     vars.innerText = str;
 }
 
@@ -600,6 +606,48 @@ function initPlayers() {
     };
 }
 
+// поиск пересечений последней линии с остальными
+function findIntersectionsWithTrack() {
+    // проверка пересечений с кривой
+    if (Global.track) {
+        for (let tr = 1; tr < 3; tr++) {
+            const len = Global.track.len;
+
+            for (let i = 0; i < len - 1; i++) {
+                let p = Line.getCrossPoints(
+                    Global.track.p[tr][i],
+                    Global.track.p[tr][i + 1],
+                    pointsOfLines[pointsOfLines.length - 2],
+                    pointsOfLines[pointsOfLines.length - 1]
+                );
+                if (p) {
+                    const cp = new ColorPoint(p.x, p.y, '#' + Math.random().toString(16).slice(-6));
+                    crossPointsWithCurve.push(cp);
+                }
+            }
+        }
+    }
+}
+
+// поиск новых пересечений с себе подобными
+function findSelfIntersections() {
+    const length = pointsOfLines.length;
+    if (length > 3) {
+        for (let i = 0; i < length - 3; i += 2) {
+            let p = Line.getCrossPoints(
+                pointsOfLines[i],
+                pointsOfLines[i + 1],
+                pointsOfLines[length - 2],
+                pointsOfLines[length - 1]
+            );
+            if (p) {
+                const cp = new ColorPoint(p.x, p.y, '#' + Math.random().toString(16).slice(-6));
+                crossPointsSelf.push(cp);
+            }
+        }
+    }
+}
+
 // Init
 window.onload = () => {
 
@@ -643,47 +691,13 @@ window.onload = () => {
         let y = e.clientY;
 
         mouseDownPoint = new Point(x, y);
-        let numOfPoints;
 
         // проверяем что за кнопка нажата
         if (e.buttons & 1) {    // Left button
-            numOfPoints = pointsOfLines.push(new Point(x / scale - offset.x, y / scale - offset.y));
-
+            let numOfPoints = pointsOfLines.push(new Point(x / scale - offset.x, y / scale - offset.y));
             if (numOfPoints % 2 == 0) {
-                // проверка пересечений с кривой
-                if (Global.track) {
-                    for (let tr = 1; tr < 3; tr++) {
-                        const len = Global.track.len;
-
-                        for (let i = 0; i < len - 1; i++) {
-                            let p = Line.getCrossPoints(
-                                Global.track.p[tr][i],
-                                Global.track.p[tr][i + 1],
-                                pointsOfLines[numOfPoints - 2],
-                                pointsOfLines[numOfPoints - 1]
-                            );
-                            if (p) {
-                                const cp = new ColorPoint(p.x, p.y, '#' + Math.random().toString(16).slice(-6));
-                                crossPointsWithCurve.push(cp);
-                            }
-                        }
-                    }
-                }
-                if (numOfPoints > 3) {
-                    // поиск новых пересечений с себе подобными
-                    for (let i = 0; i < numOfPoints - 3; i += 2) {
-                        let p = Line.getCrossPoints(
-                            pointsOfLines[i],
-                            pointsOfLines[i + 1],
-                            pointsOfLines[numOfPoints - 2],
-                            pointsOfLines[numOfPoints - 1]
-                        );
-                        if (p) {
-                            const cp = new ColorPoint(p.x, p.y, '#' + Math.random().toString(16).slice(-6));
-                            crossPointsSelf.push(cp);
-                        }
-                    }
-                }
+                findIntersectionsWithTrack();
+                findSelfIntersections();
             }
             if (Global.requestAnimationId === null) redrawCanvas();
             return;
@@ -788,7 +802,7 @@ window.onload = () => {
     });
     // =====================================
 
-    Utils.debug("Andreso loco");
+    Utils.debug("Begin");
     cnv.width = cnv.clientWidth;
     cnv.height = cnv.clientHeight;
 

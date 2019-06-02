@@ -37,15 +37,16 @@ public class Line {
     }
 
     // =====================================
+    // TODO почему-то не работает оверлоад в JS
     // поиск точки пересечения отрезков
-    public static Point getCrossPoints(Line l1, Line l2) {
-        if (isCrossing(l1, l2) == true) {
-            double[] abc = Equation(l1);
-            double[] abc2 = Equation(l2);
-            return crossPoint(abc[0], abc[1], abc[2], abc2[0], abc2[1], abc2[2]);
-        }
-        return null;
-    }
+//    public static Point getCrossPoints(Line l1, Line l2) {
+//        if (isCrossing(l1, l2) == true) {
+//            double[] abc = Equation(l1);
+//            double[] abc2 = Equation(l2);
+//            return crossPoint(abc[0], abc[1], abc[2], abc2[0], abc2[1], abc2[2]);
+//        }
+//        return null;
+//    }
 
     public static Point getCrossPoints(Point p1, Point p2, Point p3, Point p4) {
         if (isCrossing(p1, p2, p3, p4) == true) {

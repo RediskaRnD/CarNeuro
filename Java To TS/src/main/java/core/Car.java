@@ -27,16 +27,17 @@ public class Car {
     private double _carAngle = 0;               // угол машины
     private double _wheelAngle = 0;             // угол колеса машины
 
-    boolean isReady = false;                    // TODO нужен ли он?
+    public boolean isReady = false;             // TODO нужен ли он?
 
     public Object image;                        // картинка машины
 
-    double speed = 0;                           // текущая скорость машины
+    public double speed = 0;                    // текущая скорость машины
     public int keys = 0;                        // зажатые кнопки управления
 
-    double time = 0;                            // время заезда
-    int stage = 0;                              // сегмент трэка на котором находится тачка
-    double fuel = 0;                            // оставшееся количество топлива
+    public double time = 0;                     // время заезда
+    public double distance = 0;                 // пройденное расстояние
+    public int stage = 0;                       // сегмент трэка на котором находится тачка
+    public double fuel = 0;                     // оставшееся количество топлива
 
     private Sensor[] sensors;                   // сенсоры расстояния
     // =====================================
@@ -143,6 +144,7 @@ public class Car {
     // обновление позиции машины
     private void updatePosition(double dt) {
         double s = dt * this.speed;    // пройденный путь за dt
+        distance += s;
         if (_wheelAngle != 0) {
             // находим угол на который сместились за dt
             // на какой угол повернулась машина относительно точки аккермана.
@@ -313,6 +315,7 @@ public class Car {
         setWheelAngle(0);
         speed = 0;
         time = 0;
+        distance = 0;
         stage = 0;
         fuel = 1;
         isReady = true;
