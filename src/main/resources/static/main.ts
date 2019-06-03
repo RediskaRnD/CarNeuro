@@ -606,14 +606,13 @@ function initPlayers() {
     };
 }
 
+// =====================================================================================================================
 // поиск пересечений последней линии с остальными
 function findIntersectionsWithTrack() {
     // проверка пересечений с кривой
     if (Global.track) {
         for (let tr = 1; tr < 3; tr++) {
-            const len = Global.track.len;
-
-            for (let i = 0; i < len - 1; i++) {
+            for (let i = 0; i < Global.track.len - 1; i++) {
                 let p = Line.getCrossPoints(
                     Global.track.p[tr][i],
                     Global.track.p[tr][i + 1],
